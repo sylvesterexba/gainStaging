@@ -282,7 +282,7 @@ const searchInput = document.getElementById("search");
 const filterButtons = document.querySelectorAll(".filters button");
 let selectedCategory = "all";
 let activeItem = null;
-const pflSegments = Array.from({ length: 61 }, (_, i) => -60 + i);
+const pflSegments = Array.from({ length: 31 }, (_, i) => -60 + i * 2);
 const pflLabelValues = [0, -3, -6, -9, -12, -18, -24, -36, -48, -60];
 let pflSegmentElems = [];
 let pflFill = null;
@@ -558,7 +558,9 @@ function initPflMeter() {
   if (peakHoldLabel) {
     peakHoldLabel.textContent = "Peak 目標";
   }
-  pflLabels.innerHTML = pflLabelValues.map((value) => `<span>${value}</span>`).join("");
+  pflLabels.innerHTML = pflLabelValues
+    .map((value) => `<span style="bottom: ${((value + 60) / 60) * 100}%">${value}</span>`)
+    .join("");
 
   const strip = document.createElement("div");
   strip.className = "pfl-strip";
