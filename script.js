@@ -616,6 +616,7 @@ function requestMeterSpike() {
   pflMeterState.spikeActive = true;
   const state = pflMeterState;
   state.spikeTarget = state.warning ? 0 : randomBetween(state.peakLow, state.peakHigh);
+  state.spikeTarget = Math.max(-60, Math.min(state.spikeTarget, state.warning ? 0 : state.peakHigh));
   state.spikeHold = state.warning ? 0.18 + Math.random() * 0.18 : 0.09 + Math.random() * 0.16;
 }
 
@@ -657,7 +658,8 @@ function animatePflMeter(timestamp) {
     state.value += diff * 24 * dt;
   }
 
-  state.value = Math.max(-60, Math.min(state.value, 0));
+  const ceiling = state.warning ? 0 : state.peakHigh;
+  state.value = Math.max(-60, Math.min(state.value, ceiling));
   if (state.warning && state.spikeActive && state.value > -0.25) {
     state.value = 0;
   }

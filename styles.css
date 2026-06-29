@@ -144,15 +144,21 @@ main {
 }
 .detail-card h2 {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
   gap: 18px;
+  position: relative;
   margin: 0 0 14px;
+  min-height: 84px;
+  padding: 0 96px;
+  text-align: center;
 }
 .detail-title-icon {
   display: grid;
   place-items: center;
-  flex: 0 0 auto;
+  position: absolute;
+  top: 0;
+  right: 0;
   width: 84px;
   height: 84px;
   border-radius: 18px;
@@ -167,7 +173,7 @@ main {
 }
 .detail-title-text {
   min-width: 0;
-  padding-top: 6px;
+  padding-top: 0;
 }
 .item-title {
   margin: 0 0 8px;
@@ -277,11 +283,13 @@ main {
   padding: 24px;
   border: 1px solid rgba(148, 163, 184, 0.14);
 }
-.detail-card > h2,
 .detail-card > p,
 .detail-card > .detail-group:not(.detail-group--meter),
 .detail-card > .detail-note {
   grid-column: 2;
+}
+.detail-card > h2 {
+  grid-column: 1 / -1;
 }
 .detail-card p {
   color: #cbd5e1;
@@ -303,7 +311,7 @@ main {
 }
 .detail-group--meter {
   grid-column: 1;
-  grid-row: 1 / span 10;
+  grid-row: 2 / span 10;
   margin: 0;
 }
 .detail-group h3 {
@@ -666,6 +674,10 @@ main {
   }
   .detail-card h2 {
     gap: 14px;
+    min-height: 72px;
+    padding: 0 84px 0 0;
+    justify-content: flex-start;
+    text-align: left;
   }
   .detail-title-icon {
     width: 72px;
@@ -708,10 +720,10 @@ main {
     flex-direction: column;
   }
   .detail-group--meter {
-    order: -10;
+    order: -6;
   }
   .detail-card > h2 {
-    order: -9;
+    order: -10;
   }
   .detail-card > p {
     order: -8;
