@@ -44,17 +44,17 @@
           <h2 id="detailName">請選擇一個項目</h2>
           <p id="detailCategory">顯示推薦麥克風型號、RMS 範圍與 Peak 目標。</p>
 
-          <div class="detail-group">
+          <div class="detail-group detail-group--mic">
             <h3>建議麥克風類型</h3>
             <p id="detailMicType">-</p>
           </div>
 
-          <div class="detail-group">
+          <div class="detail-group detail-group--models">
             <h3>推薦型號</h3>
             <p id="detailModels">-</p>
           </div>
 
-          <div class="detail-group">
+          <div class="detail-group detail-group--meter">
             <h3>RMS / Peak 參考圖示</h3>
             <div class="pfl-visualizer">
               <div class="pfl-visualizer__labels" id="pflLabels"></div>
@@ -71,23 +71,24 @@
               </div>
             </div>
             <p id="detailPflValue" class="pfl-value">-</p>
-            <div id="pflNote" class="pfl-note"></div>
           </div>
 
-          <div class="detail-group">
+          <div class="detail-group detail-group--rms">
             <h3>平均 RMS</h3>
             <p id="detailRms">-</p>
           </div>
 
-          <div class="detail-group">
+          <div class="detail-group detail-group--peak">
             <h3>Peak 目標</h3>
             <p id="detailPeak">-</p>
           </div>
 
-          <div class="detail-group">
+          <div class="detail-group detail-group--headroom">
             <h3>預估 Headroom</h3>
             <p id="detailHeadroom">-</p>
           </div>
+
+          <div id="pflNote" class="pfl-note detail-note"></div>
         </div>
       </aside>
     </section>
