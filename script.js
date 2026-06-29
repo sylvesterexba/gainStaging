@@ -547,7 +547,7 @@ function setPflTarget(item) {
 }
 
 function getSegmentColor(threshold) {
-  if (threshold >= 0) return "red";
+  if (threshold === 0) return "red";
   if (threshold >= -18) return "yellow";
   return "green";
 }
@@ -660,7 +660,7 @@ function animatePflMeter(timestamp) {
 
   const ceiling = state.warning ? 0 : state.peakHigh;
   state.value = Math.max(-60, Math.min(state.value, ceiling));
-  if (state.warning && state.spikeActive && state.value > -0.25) {
+  if (state.warning && state.spikeActive && state.value > -0.02) {
     state.value = 0;
   }
 
