@@ -1,5 +1,16 @@
 const instruments = [
   {
+    name: "Clip / Clipping 削波警示",
+    category: "warning",
+    rms: "-8 ~ -3 dBFS",
+    peak: "-1 ~ 0 dBFS",
+    headroom: "不足 1 dB",
+    micType: "輸入過載 / 增益過高",
+    models: "降低 Preamp Gain、Pad、來源音量或輸入 Trim",
+    warning: true,
+    note: "這是削波警示範例：只要電平碰到 0 dBFS 就代表數位削波風險，請立刻降低前級增益或來源音量。"
+  },
+  {
     name: "Male Vocal 男主唱",
     category: "vocal",
     rms: "-24 ~ -18 dBFS",
@@ -18,17 +29,6 @@ const instruments = [
     micType: "動圈 / 電容",
     models: "SM58, e865, KSM9, NT1-A",
     note: "可視人聲強度選用動圈或電容麥克風搭配防噴罩。"
-  },
-  {
-    name: "Clip / Clipping 削波警示",
-    category: "warning",
-    rms: "-8 ~ -3 dBFS",
-    peak: "-1 ~ 0 dBFS",
-    headroom: "不足 1 dB",
-    micType: "輸入過載 / 增益過高",
-    models: "降低 Preamp Gain、Pad、來源音量或輸入 Trim",
-    warning: true,
-    note: "這是削波警示範例：只要電平碰到 0 dBFS 就代表數位削波風險，請立刻降低前級增益或來源音量。"
   },
   {
     name: "Acoustic Guitar 木吉他 (Mic)",
