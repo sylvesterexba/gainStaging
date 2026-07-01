@@ -914,8 +914,30 @@ function updateFloatingButtonState() {
   if (floatingSimButtonText) {
     floatingSimButtonText.textContent = nearSimulator ? "回到上方" : "前往模擬器";
   }
-  floatingSimButton.setAttribute("aria-label", nearSimulator ? "回到頁面上方" : "前往增益級距模擬器");
-  floatingSimButton.setAttribute("title", nearSimulator ? "回到頁面上方" : "前往 Gain Staging Simulator");
+  updateFloatingKnobIcon();
+}
+
+function updateFloatingKnobIcon() {
+  if (!floatingSimButton) return;
+  const gainRatio = clamp(currentGain / 60, 0, 1);
+  const angle = -135 + gainRatio * 270;
+  const ledAngle = gainRatio * 270;
+
+  // 浮動旋鈕跟主 Gain 使用同一組角度公式，避免兩個入口顯示不同狀態造成使用者混淆。
+  floatingSimButton.style.setProperty("--floating-knob-angle", `${angle}deg`);
+  floatingSimButton.style.setProperty("--floating-gain-angle", `${ledAngle}deg`);
+  floatingSimButton.dataset.status = inputStatus;
+
+  const isAtSimulator = floatingSimButton.classList.contains("is-at-simulator");
+  const gainText = `目前 Gain +${Math.round(currentGain)} dB`;
+  floatingSimButton.setAttribute(
+    "aria-label",
+    isAtSimulator ? `回到頁面上方，${gainText}` : `前往增益級距模擬器，${gainText}`
+  );
+  floatingSimButton.setAttribute(
+    "title",
+    isAtSimulator ? `回到頁面上方，${gainText}` : `前往 Gain Staging Simulator，${gainText}`
+  );
 }
 
 function resetGainToRecommended() {
@@ -1180,6 +1202,7 @@ function updateKnob() {
       dot.classList.toggle("is-active", index < activeCount);
     });
   }
+  updateFloatingKnobIcon();
 }
 
 function updateInputMeter() {
@@ -1266,6 +1289,7 @@ function updateStatusMessage() {
   setStatusClass(floatingSimButton, inputStatus);
   gainKnob?.classList.toggle("is-clipping", inputStatus === "clip");
   floatingSimButton?.classList.toggle("is-clipping", inputStatus === "clip");
+  updateFloatingKnobIcon();
 }
 
 function updateSimulatorFrame(timestamp) {

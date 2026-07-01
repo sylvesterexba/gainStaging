@@ -1160,6 +1160,8 @@ main {
 /* 浮動入口用迷你旋鈕做視覺提示，讓它跟 Gain 模擬器產生明確關聯，而不只是一般跳轉按鈕。 */
 .floating-sim-button {
   --floating-knob-color: #38bdf8;
+  --floating-knob-angle: -9deg;
+  --floating-gain-angle: 126deg;
   position: fixed;
   right: 22px;
   bottom: 22px;
@@ -1217,7 +1219,8 @@ main {
   inset: 0;
   border-radius: 50%;
   background:
-    conic-gradient(from -135deg, var(--floating-knob-color) 0 92deg, rgba(71, 85, 105, 0.25) 92deg 270deg, transparent 270deg),
+    /* LED 弧長直接吃 currentGain 換算結果，讓浮動入口成為主 Gain 旋鈕的縮小同步版。 */
+    conic-gradient(from -135deg, var(--floating-knob-color) 0 var(--floating-gain-angle), rgba(71, 85, 105, 0.25) var(--floating-gain-angle) 270deg, transparent 270deg),
     radial-gradient(circle, transparent 54%, rgba(148, 163, 184, 0.28) 55% 60%, transparent 61%);
   filter: drop-shadow(0 0 6px color-mix(in srgb, var(--floating-knob-color) 55%, transparent));
   transition: filter 0.18s ease, opacity 0.18s ease;
@@ -1241,20 +1244,20 @@ main {
   border-radius: 999px;
   background: #f8fafc;
   box-shadow: 0 0 6px rgba(255,255,255,0.65);
-  transform: translateX(-50%) rotate(-18deg);
+  transform: translateX(-50%) rotate(var(--floating-knob-angle));
   transform-origin: 50% 9px;
   transition: transform 0.18s ease;
 }
 .floating-sim-button:hover .floating-knob-pointer,
 .floating-sim-button:focus-visible .floating-knob-pointer {
-  transform: translateX(-50%) rotate(-4deg);
+  transform: translateX(-50%) rotate(calc(var(--floating-knob-angle) + 12deg));
 }
 .floating-sim-button:hover .floating-knob-leds,
 .floating-sim-button:focus-visible .floating-knob-leds {
   filter: drop-shadow(0 0 10px color-mix(in srgb, var(--floating-knob-color) 72%, transparent));
 }
 .floating-sim-button:active .floating-knob-pointer {
-  transform: translateX(-50%) rotate(-18deg);
+  transform: translateX(-50%) rotate(var(--floating-knob-angle));
 }
 @keyframes currentGlow {
   from {
