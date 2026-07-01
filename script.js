@@ -323,11 +323,17 @@ let simulatedInputRMS = -24;
 let simulatedInputPeak = -9;
 let simulatedOutputL = -9;
 let simulatedOutputR = -10;
+let displayInputRMS = -24;
+let displayInputPeak = -9;
+let displayOutputL = -9;
+let displayOutputR = -10;
 let inputStatus = "good";
 let outputStatus = "good";
 let simulatorAnimationLast = null;
 let simulatorNoisePhase = 0;
 let stereoDifference = 0.9;
+let stereoOffsetTimer = 0;
+let simulatorTextLast = 0;
 let simulatorProfile = {
   rmsLow: -24,
   rmsHigh: -18,
@@ -339,6 +345,11 @@ let simulatorProfile = {
   sourcePeakAtZero: -37
 };
 const simulatorMeters = new Map();
+const simulatorPeakHolds = {
+  inputPeak: { value: -60, hold: 0 },
+  outputL: { value: -60, hold: 0 },
+  outputR: { value: -60, hold: 0 }
+};
 const faderCurve = [
   { db: 10, position: 0 },
   { db: 5, position: 0.08 },
@@ -907,17 +918,32 @@ function resetGainToRecommended() {
   const recommendedRmsCenter = (simulatorProfile.rmsLow + simulatorProfile.rmsHigh) / 2;
   simulatedInputPeak = recommendedPeakCenter;
   simulatedInputRMS = recommendedRmsCenter;
+  displayInputPeak = recommendedPeakCenter;
+  displayInputRMS = recommendedRmsCenter;
+  simulatorPeakHolds.inputPeak = { value: recommendedPeakCenter, hold: 0.9 };
+  calculateStereoOutput();
+  displayOutputL = simulatedOutputL;
+  displayOutputR = simulatedOutputR;
+  simulatorPeakHolds.outputL = { value: simulatedOutputL, hold: 0.9 };
+  simulatorPeakHolds.outputR = { value: simulatedOutputR, hold: 0.9 };
   updateKnob();
   updateInputMeter();
   updateStereoMeter();
   updateStatusMessage();
+  updateDisplayReadouts(performance.now(), true);
 }
 
 function resetFaderToUnity() {
   currentFader = 0;
+  calculateStereoOutput();
+  displayOutputL = simulatedOutputL;
+  displayOutputR = simulatedOutputR;
+  simulatorPeakHolds.outputL = { value: simulatedOutputL, hold: 0.9 };
+  simulatorPeakHolds.outputR = { value: simulatedOutputR, hold: 0.9 };
   updateFader();
   updateStereoMeter();
   updateStatusMessage();
+  updateDisplayReadouts(performance.now(), true);
 }
 
 function handleDoubleTapReset(element, callback) {
@@ -978,7 +1004,7 @@ function getSimulatorMeterPercent(value) {
 function createSimulatorMeter(container) {
   if (!container) return [];
 
-  container.innerHTML = "<div class=\"sim-target-zone\"></div>";
+  container.innerHTML = "<div class=\"sim-target-zone\"></div><span class=\"sim-peak-marker\"></span>";
   simulatorMeterMarks.forEach((threshold) => {
     const segment = document.createElement("div");
     segment.className = `sim-led sim-led--${getSimulatorSegmentColor(threshold)} sim-led--off`;
@@ -991,6 +1017,7 @@ function createSimulatorMeter(container) {
   simulatorMeters.set(container.id, {
     container,
     target: container.querySelector(".sim-target-zone"),
+    marker: container.querySelector(".sim-peak-marker"),
     segments
   });
   return segments;
@@ -1040,6 +1067,53 @@ function updateSimulatorMeter(container, value) {
   });
 }
 
+function updatePeakHoldState(state, currentValue, dt) {
+  if (currentValue >= state.value) {
+    state.value = currentValue;
+    state.hold = 0.9;
+    return;
+  }
+
+  if (state.hold > 0) {
+    state.hold = Math.max(0, state.hold - dt);
+    return;
+  }
+
+  state.value = Math.max(currentValue, state.value - 5 * dt);
+}
+
+function updatePeakHoldMarker(container, holdValue) {
+  const meter = simulatorMeters.get(container && container.id);
+  if (!meter || !meter.marker) return;
+  meter.marker.style.bottom = getSimulatorMeterBottom(holdValue);
+  meter.marker.style.opacity = "1";
+}
+
+function calculateStereoOutput() {
+  const outputBase = currentFader <= -89.5 ? -90 : simulatedInputPeak + currentFader;
+  simulatedOutputL = outputBase + stereoDifference / 2;
+  simulatedOutputR = outputBase - stereoDifference / 2;
+}
+
+function updateDisplayReadouts(timestamp, force = false) {
+  if (!force && timestamp - simulatorTextLast < 150) return;
+  simulatorTextLast = timestamp;
+
+  displayInputRMS += (simulatedInputRMS - displayInputRMS) * 0.045;
+  displayInputPeak = simulatorPeakHolds.inputPeak.value >= displayInputPeak
+    ? simulatorPeakHolds.inputPeak.value
+    : displayInputPeak + (simulatorPeakHolds.inputPeak.value - displayInputPeak) * 0.065;
+  displayOutputL += (simulatedOutputL - displayOutputL) * 0.045;
+  displayOutputR += (simulatedOutputR - displayOutputR) * 0.045;
+
+  if (inputReadout) {
+    inputReadout.textContent = `RMS ${formatDbfs(displayInputRMS)} / Peak ${formatDbfs(displayInputPeak)}`;
+  }
+  if (outputReadout) {
+    outputReadout.textContent = `L ${formatDbfs(displayOutputL)} / R ${formatDbfs(displayOutputR)}`;
+  }
+}
+
 function setSimulatorProfile(item) {
   if (!item) return;
   const profile = getItemMeterProfile(item);
@@ -1062,19 +1136,27 @@ function setSimulatorProfile(item) {
   currentFader = 0;
   simulatedInputRMS = rmsCenter;
   simulatedInputPeak = peakCenter;
-  simulatedOutputL = peakCenter;
-  simulatedOutputR = peakCenter - stereoDifference;
+  displayInputRMS = rmsCenter;
+  displayInputPeak = peakCenter;
+  stereoDifference = randomBetween(0.5, 1.5) * (Math.random() > 0.5 ? 1 : -1);
+  calculateStereoOutput();
+  displayOutputL = simulatedOutputL;
+  displayOutputR = simulatedOutputR;
+  simulatorPeakHolds.inputPeak = { value: peakCenter, hold: 0.9 };
+  simulatorPeakHolds.outputL = { value: simulatedOutputL, hold: 0.9 };
+  simulatorPeakHolds.outputR = { value: simulatedOutputR, hold: 0.9 };
   simulatorNoisePhase = Math.random() * Math.PI * 2;
-  stereoDifference = randomBetween(0.5, 1.5);
+  stereoOffsetTimer = randomBetween(0.3, 0.5);
 
   if (simulatorSource) simulatorSource.textContent = `目前聲源：${item.name}`;
-  if (outputFader) outputFader.value = String(currentFader);
+  if (outputFader) outputFader.value = String(valueToFaderPosition(currentFader));
   updateSimulatorTargetZones();
   updateKnob();
   updateFader();
   updateInputMeter();
   updateStereoMeter();
   updateStatusMessage();
+  updateDisplayReadouts(performance.now(), true);
 }
 
 function updateKnob() {
@@ -1097,9 +1179,7 @@ function updateKnob() {
 function updateInputMeter() {
   updateSimulatorMeter(inputRmsMeter, simulatedInputRMS);
   updateSimulatorMeter(inputPeakMeter, simulatedInputPeak);
-  if (inputReadout) {
-    inputReadout.textContent = `RMS ${formatDbfs(simulatedInputRMS)} / Peak ${formatDbfs(simulatedInputPeak)}`;
-  }
+  updatePeakHoldMarker(inputPeakMeter, simulatorPeakHolds.inputPeak.value);
 }
 
 function updateFader() {
@@ -1118,13 +1198,12 @@ function updateFader() {
 function updateStereoMeter() {
   updateSimulatorMeter(outputLeftMeter, simulatedOutputL);
   updateSimulatorMeter(outputRightMeter, simulatedOutputR);
+  updatePeakHoldMarker(outputLeftMeter, simulatorPeakHolds.outputL.value);
+  updatePeakHoldMarker(outputRightMeter, simulatorPeakHolds.outputR.value);
   outputLeftMeter?.classList.toggle("is-clipping", simulatedOutputL >= 0);
   outputRightMeter?.classList.toggle("is-clipping", simulatedOutputR >= 0);
   outputLeftClip?.classList.toggle("is-clipping", simulatedOutputL >= 0);
   outputRightClip?.classList.toggle("is-clipping", simulatedOutputR >= 0);
-  if (outputReadout) {
-    outputReadout.textContent = `L ${formatDbfs(simulatedOutputL)} / R ${formatDbfs(simulatedOutputR)}`;
-  }
 }
 
 function setStatusClass(node, status) {
@@ -1196,13 +1275,23 @@ function updateSimulatorFrame(timestamp) {
   simulatedInputRMS += (targetRms - simulatedInputRMS) * rmsAlpha;
   simulatedInputPeak += (targetPeak - simulatedInputPeak) * peakAlpha;
 
+  stereoOffsetTimer -= dt;
+  if (stereoOffsetTimer <= 0) {
+    stereoDifference = randomBetween(0.3, 1.5) * (Math.random() > 0.5 ? 1 : -1);
+    stereoOffsetTimer = randomBetween(0.3, 0.5);
+  }
+
   const outputBase = currentFader <= -89.5 ? -90 : simulatedInputPeak + currentFader;
-  const drift = Math.sin(timestamp * 0.0027) * 0.25;
-  simulatedOutputL = outputBase + stereoDifference / 2 + drift;
-  simulatedOutputR = outputBase - stereoDifference / 2 - drift;
+  simulatedOutputL = outputBase + stereoDifference / 2;
+  simulatedOutputR = outputBase - stereoDifference / 2;
+
+  updatePeakHoldState(simulatorPeakHolds.inputPeak, simulatedInputPeak, dt);
+  updatePeakHoldState(simulatorPeakHolds.outputL, simulatedOutputL, dt);
+  updatePeakHoldState(simulatorPeakHolds.outputR, simulatedOutputR, dt);
 
   updateInputMeter();
   updateStereoMeter();
+  updateDisplayReadouts(timestamp);
   updateStatusMessage();
   requestAnimationFrame(updateSimulatorFrame);
 }
@@ -1270,41 +1359,65 @@ function bindOutputFader() {
   });
 }
 
-function setFaderFromPointer(event) {
-  if (!wingFader) return;
-  const rect = wingFader.getBoundingClientRect();
-  const position = clamp((event.clientY - rect.top) / rect.height, 0, 1);
+function setFaderFromPosition(position) {
   currentFader = faderPositionToValue(position);
+  calculateStereoOutput();
   updateFader();
   updateStereoMeter();
   updateStatusMessage();
+  updateDisplayReadouts(performance.now());
+}
+
+function setFaderFromPointer(event) {
+  if (!wingFader) return;
+  const rect = wingFader.getBoundingClientRect();
+  setFaderFromPosition(clamp((event.clientY - rect.top) / rect.height, 0, 1));
 }
 
 function bindFaderPointerControl() {
   if (!wingFader) return;
-  let dragging = false;
+  let isDraggingFader = false;
+  let dragStartY = 0;
+  let dragStartPosition = 0;
+  let dragTrackHeight = 1;
 
   wingFader.addEventListener("pointerdown", (event) => {
-    dragging = true;
+    isDraggingFader = true;
+    dragStartY = event.clientY;
+    dragStartPosition = valueToFaderPosition(currentFader);
+    dragTrackHeight = wingFader.getBoundingClientRect().height || 1;
     wingFader.setPointerCapture(event.pointerId);
     wingFader.classList.add("is-dragging");
-    setFaderFromPointer(event);
+    if (!event.target.closest(".fader-cap")) {
+      setFaderFromPointer(event);
+      dragStartPosition = valueToFaderPosition(currentFader);
+      dragStartY = event.clientY;
+    }
   });
 
   wingFader.addEventListener("pointermove", (event) => {
-    if (!dragging) return;
-    setFaderFromPointer(event);
+    if (!isDraggingFader) return;
+    const deltaY = event.clientY - dragStartY;
+    const newPosition = clamp(dragStartPosition + deltaY / dragTrackHeight, 0, 1);
+    setFaderFromPosition(newPosition);
   });
 
   ["pointerup", "pointercancel"].forEach((eventName) => {
     wingFader.addEventListener(eventName, (event) => {
-      dragging = false;
+      isDraggingFader = false;
       wingFader.classList.remove("is-dragging");
       if (wingFader.hasPointerCapture(event.pointerId)) {
         wingFader.releasePointerCapture(event.pointerId);
       }
     });
   });
+
+  wingFader.addEventListener("wheel", (event) => {
+    event.preventDefault();
+    const position = valueToFaderPosition(currentFader);
+    const nextPosition = clamp(position + (event.deltaY < 0 ? -0.025 : 0.025), 0, 1);
+    setFaderFromPosition(nextPosition);
+  }, { passive: false });
 }
 
 function initKnobLedRing() {
