@@ -1339,7 +1339,7 @@ main {
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
   main {
     padding: 16px;
   }
@@ -1359,17 +1359,17 @@ main {
     order: 0;
     margin-bottom: 0;
   }
-  /* 手機版把兩個 wrapper 展開成同一層，狀態提示才能緊跟對應的 meter，而不是全部堆在最後。 */
+  /* 手機版把兩個 wrapper 展開成同一層，並讓警告框排在 meter 上方，使用者先看到狀態再看電平。 */
   .simulator-grid,
   .sim-status-grid {
     display: contents;
   }
   .sim-panel--gain { order: 1; }
-  .sim-panel--meter { order: 2; }
-  #inputStatusBox { order: 3; }
+  #inputStatusBox { order: 2; }
+  .sim-panel--meter { order: 3; }
   .sim-panel--fader { order: 4; }
-  .sim-panel--output { order: 5; }
-  #outputStatusBox { order: 6; }
+  #outputStatusBox { order: 5; }
+  .sim-panel--output { order: 6; }
   .sim-lesson {
     order: 7;
     margin-top: 0;
