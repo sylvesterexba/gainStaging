@@ -1,0 +1,26 @@
+﻿/* base.css：只放全站基礎設定，讓後續 layout / component 檔案可以共用同一個起點。 */
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  background: linear-gradient(180deg, #111827 0%, #1f2937 100%);
+  color: #eceff4;
+}
+
+/* 英中標題拆行規則放在 base，因為 Detail 與 Simulator 都會共用這組語意。
+.bilingual-title {
+  display: inline;
+}
+h1.bilingual-title,
+h2.bilingual-title {
+  display: block;
+}
+.title-en,
+.title-zh {
+  display: inline;
+}
+.title-zh {
+  margin-left: 0.32em;
+}

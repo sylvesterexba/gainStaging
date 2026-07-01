@@ -1,0 +1,395 @@
+﻿/* components.css：集中按鈕、卡片、chip、Modal 與浮動入口等可重複元件。 */
+.about-button {
+  margin-top: 18px;
+  border: 1px solid rgba(56, 189, 248, 0.42);
+  border-radius: 999px;
+  padding: 10px 18px;
+  background: rgba(14, 165, 233, 0.12);
+  color: #e0f2fe;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: inset 0 0 18px rgba(56, 189, 248, 0.08);
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+.about-button:hover,
+.about-button:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(125, 211, 252, 0.72);
+  background: rgba(14, 165, 233, 0.2);
+  outline: none;
+}
+.picker-toggle,
+.picker-backdrop {
+  display: none;
+}
+.filters button {
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(30, 41, 59, 0.86);
+  color: #e2e8f0;
+  border-radius: 999px;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.filters button.active,
+.filters button:hover {
+  background: #2563eb;
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+}
+.item-card {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  border-radius: 18px;
+  background: rgba(30, 41, 59, 0.85);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.item-card:hover,
+.item-card.active {
+  background: rgba(37, 99, 235, 0.18);
+  transform: translateY(-1px);
+}
+.item-card--warning {
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  background: rgba(127, 29, 29, 0.18);
+}
+.item-card--warning:hover,
+.item-card--warning.active {
+  background: rgba(185, 28, 28, 0.24);
+}
+.item-card--warning .item-icon {
+  color: #fca5a5;
+  border-color: rgba(248, 113, 113, 0.5);
+  background: rgba(127, 29, 29, 0.22);
+}
+.item-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(56, 189, 248, 0.34);
+  background: rgba(15, 23, 42, 0.34);
+  color: #7dd3fc;
+}
+.item-icon::before,
+.item-icon::after {
+  display: none;
+}
+.item-icon svg {
+  width: 29px;
+  height: 29px;
+}
+.item-icon svg *,
+.detail-icon svg * {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.item-title {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+}
+.item-content {
+  min-width: 0;
+}
+.item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+}
+.warning-pill {
+  color: #fecaca;
+  border: 1px solid rgba(248, 113, 113, 0.5);
+  background: rgba(127, 29, 29, 0.24);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+.mic-chip,
+.mic-type-display {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.mic-chip::before,
+.mic-type-icon {
+  content: "";
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1px solid rgba(125, 211, 252, 0.55);
+  background:
+    linear-gradient(currentColor, currentColor) center 5px / 8px 2px no-repeat,
+    linear-gradient(currentColor, currentColor) center 9px / 10px 2px no-repeat,
+    linear-gradient(currentColor, currentColor) center 13px / 6px 2px no-repeat;
+  color: #7dd3fc;
+}
+.mic-chip--dynamic::before,
+.mic-type-display--dynamic .mic-type-icon {
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 50%, currentColor 0 2px, transparent 2.5px),
+    linear-gradient(currentColor, currentColor) center 12px / 10px 2px no-repeat;
+  color: #93c5fd;
+}
+.mic-chip--condenser::before,
+.mic-chip--sdc::before,
+.mic-type-display--condenser .mic-type-icon,
+.mic-type-display--sdc .mic-type-icon {
+  background:
+    linear-gradient(currentColor, currentColor) center 4px / 6px 2px no-repeat,
+    linear-gradient(currentColor, currentColor) center 8px / 6px 2px no-repeat,
+    linear-gradient(currentColor, currentColor) center 12px / 6px 2px no-repeat;
+  color: #a7f3d0;
+}
+.mic-chip--di::before,
+.mic-type-display--di .mic-type-icon {
+  border-radius: 4px;
+  background:
+    radial-gradient(circle at 6px 9px, currentColor 0 2px, transparent 2.5px),
+    radial-gradient(circle at 12px 9px, currentColor 0 2px, transparent 2.5px);
+  color: #fde68a;
+}
+.mic-chip--kick::before,
+.mic-type-display--kick .mic-type-icon {
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, currentColor 0 4px, transparent 4.5px);
+  color: #fca5a5;
+}
+.mic-chip--warning::before,
+.mic-type-display--warning .mic-type-icon {
+  border-color: rgba(248, 113, 113, 0.65);
+  background:
+    linear-gradient(currentColor, currentColor) center 4px / 2px 7px no-repeat,
+    radial-gradient(circle at 50% 13px, currentColor 0 1.5px, transparent 2px);
+  color: #fca5a5;
+}
+.mic-chip--playback::before,
+.mic-type-display--playback .mic-type-icon {
+  border-color: rgba(125, 211, 252, 0.65);
+  background:
+    linear-gradient(currentColor, currentColor) 5px center / 2px 10px no-repeat,
+    linear-gradient(135deg, transparent 0 28%, currentColor 29% 48%, transparent 49%) 8px center / 8px 10px no-repeat,
+    linear-gradient(currentColor, currentColor) 12px center / 2px 8px no-repeat;
+  color: #7dd3fc;
+}
+.warning-note {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  color: #fee2e2;
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  background: rgba(127, 29, 29, 0.18);
+  border-radius: 14px;
+  padding: 12px 14px;
+  overflow-wrap: anywhere;
+}
+.warning-note strong {
+  color: #fca5a5;
+}
+/* 浮動入口用迷你旋鈕做視覺提示，讓它跟 Gain 模擬器產生明確關聯，而不只是一般跳轉按鈕。 */
+.floating-sim-button {
+  --floating-gain-color: #38bdf8;
+  --floating-knob-rotation: -9deg;
+  --floating-gain-angle: 126deg;
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(56, 189, 248, 0.55);
+  border-radius: 999px;
+  padding: 10px 16px 10px 12px;
+  background: rgba(15, 23, 42, 0.86);
+  color: #e0f2fe;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.38), inset 0 0 18px rgba(56, 189, 248, 0.08);
+  backdrop-filter: blur(12px);
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+.floating-sim-button.floating-knob-low { --floating-gain-color: #7dd3fc; }
+.floating-sim-button.floating-knob-good { --floating-gain-color: #4ade80; }
+.floating-sim-button.floating-knob-warning { --floating-gain-color: #fb923c; }
+.floating-sim-button.floating-knob-clip,
+.floating-sim-button.is-clipping { --floating-gain-color: #ef4444; }
+.floating-sim-button:hover {
+  transform: translateY(-2px);
+  border-color: rgba(251, 146, 60, 0.72);
+  background: rgba(15, 23, 42, 0.94);
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.44), 0 0 22px rgba(251, 146, 60, 0.18);
+}
+.floating-sim-button:active {
+  transform: translateY(0) scale(0.97);
+}
+.floating-sim-button:focus-visible {
+  outline: 3px solid rgba(125, 211, 252, 0.72);
+  outline-offset: 4px;
+}
+.floating-sim-button.is-at-simulator {
+  border-color: rgba(251, 146, 60, 0.72);
+  color: #ffedd5;
+}
+.floating-knob-icon {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  pointer-events: none;
+}
+.floating-knob-leds {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    /* LED 弧長與顏色都由 JS 即時寫入，讓它反映目前 Gain，而不是固定裝飾。 */
+    conic-gradient(from -135deg, var(--floating-gain-color) 0 var(--floating-gain-angle), rgba(120, 150, 180, 0.25) var(--floating-gain-angle) 270deg, transparent 270deg),
+    radial-gradient(circle, transparent 54%, rgba(148, 163, 184, 0.28) 55% 60%, transparent 61%);
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--floating-gain-color) 55%, transparent));
+  transition: filter 0.18s ease, opacity 0.18s ease;
+}
+.floating-knob-body {
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  border: 1px solid rgba(226, 232, 240, 0.22);
+  background:
+    radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.22), transparent 18%),
+    radial-gradient(circle at 50% 55%, #334155 0 28%, #111827 66%, #020617 100%);
+  box-shadow: inset 0 3px 5px rgba(255,255,255,0.08), inset 0 -6px 8px rgba(0,0,0,0.5);
+}
+.floating-knob-pointer {
+  position: absolute;
+  top: 7px;
+  left: 50%;
+  width: 2px;
+  height: 9px;
+  border-radius: 999px;
+  background: #f8fafc;
+  box-shadow: 0 0 6px rgba(255,255,255,0.65);
+  transform: translateX(-50%) rotate(var(--floating-knob-rotation));
+  transform-origin: 50% 9px;
+  transition: transform 0.18s ease;
+}
+.floating-sim-button:hover .floating-knob-pointer,
+.floating-sim-button:focus-visible .floating-knob-pointer {
+  transform: translateX(-50%) rotate(calc(var(--floating-knob-rotation) + 12deg));
+}
+.floating-sim-button:hover .floating-knob-leds,
+.floating-sim-button:focus-visible .floating-knob-leds {
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--floating-gain-color) 72%, transparent));
+}
+.floating-sim-button:active .floating-knob-pointer {
+  transform: translateX(-50%) rotate(var(--floating-knob-rotation));
+}
+.about-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+.about-modal.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.about-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(8px);
+}
+.about-modal__panel {
+  position: relative;
+  width: min(720px, 100%);
+  max-height: min(82vh, 720px);
+  overflow: auto;
+  border: 1px solid rgba(125, 211, 252, 0.24);
+  border-radius: 22px;
+  padding: 28px;
+  background: rgba(15, 23, 42, 0.98);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5), inset 0 0 28px rgba(56, 189, 248, 0.06);
+}
+.about-modal__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 999px;
+  background: rgba(30, 41, 59, 0.9);
+  color: #e2e8f0;
+  font-size: 1.45rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.about-modal__close:hover,
+.about-modal__close:focus-visible {
+  border-color: rgba(125, 211, 252, 0.68);
+  color: #fff;
+  outline: none;
+}
+.about-modal__eyebrow {
+  color: #38bdf8;
+  font-weight: 900;
+}
+.about-modal h2 {
+  margin: 8px 46px 12px 0;
+  font-size: clamp(1.35rem, 2vw, 1.9rem);
+}
+.about-modal p {
+  margin: 0 0 18px;
+  color: #cbd5e1;
+  line-height: 1.75;
+}
+.about-modal__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.about-modal section {
+  min-width: 0;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 16px;
+  padding: 16px;
+  background: rgba(17, 24, 39, 0.72);
+}
+.about-modal h3 {
+  margin: 0 0 10px;
+  color: #38bdf8;
+}
+.about-modal ul {
+  margin: 0;
+  padding-left: 1.2em;
+  color: #e2e8f0;
+  line-height: 1.75;
+}
+body.about-open {
+  overflow: hidden;
+}

@@ -1,0 +1,502 @@
+﻿/* simulator.css：Gain Staging Simulator 的旋鈕、推桿、LED meter 與狀態教學集中於此。 */
+.simulator-card {
+  max-width: 1280px;
+  margin: 24px auto 0;
+  padding: 24px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.95);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.26);
+}
+.simulator-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+.simulator-header h2 {
+  margin: 0;
+  font-size: clamp(1.55rem, 2.2vw, 2.2rem);
+}
+.simulator-header p {
+  margin: 8px 0 0;
+  max-width: 720px;
+  color: #cbd5e1;
+}
+.simulator-source {
+  flex: 0 0 auto;
+  max-width: 360px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  background: rgba(14, 165, 233, 0.1);
+  color: #bae6fd;
+  font-weight: 800;
+  text-align: right;
+}
+.simulator-grid {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.9fr) minmax(260px, 1.25fr) minmax(150px, 0.65fr) minmax(260px, 1.15fr);
+  gap: 16px;
+  align-items: stretch;
+}
+.sim-panel {
+  min-width: 0;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.13);
+  background: rgba(17, 24, 39, 0.78);
+}
+.sim-panel-title {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 16px;
+  color: #cbd5e1;
+}
+.sim-panel-title span {
+  color: #38bdf8;
+  font-weight: 900;
+}
+.sim-panel-title strong {
+  color: #f8fafc;
+  font-size: 1.05rem;
+}
+.control-value {
+  display: block;
+  margin-top: 18px;
+  color: #f8fafc;
+  font-size: 0.95rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 14px rgba(56, 189, 248, 0.22);
+}
+.sim-panel p {
+  margin: 14px 0 0;
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+.sim-panel--gain,
+.sim-panel--fader {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  text-align: center;
+}
+.gain-knob {
+  --knob-angle: -9deg;
+  --knob-state-color: #7dd3fc;
+  position: relative;
+  width: 110px;
+  height: 110px;
+  border: 1px solid rgba(203, 213, 225, 0.38);
+  border-radius: 50%;
+  padding: 0;
+  cursor: grab;
+  touch-action: none;
+  background:
+    linear-gradient(145deg, rgba(226, 232, 240, 0.28), rgba(15, 23, 42, 0) 28%),
+    radial-gradient(circle at 46% 42%, #334155 0 14%, #1f2937 34%, #0f172a 62%, #020617 100%);
+  box-shadow:
+    inset 0 10px 18px rgba(255, 255, 255, 0.08),
+    inset 0 -18px 26px rgba(0, 0, 0, 0.66),
+    0 15px 34px rgba(0, 0, 0, 0.42);
+  transition: box-shadow 0.18s ease, border-color 0.18s ease, filter 0.18s ease;
+}
+.gain-knob::before {
+  content: "";
+  position: absolute;
+  inset: -15px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 58%, rgba(148, 163, 184, 0.26) 59% 61%, transparent 62%),
+    conic-gradient(from -135deg, color-mix(in srgb, var(--knob-state-color) 58%, transparent) 0deg, color-mix(in srgb, var(--knob-state-color) 58%, transparent) calc((var(--knob-angle) + 135deg)), rgba(71, 85, 105, 0.18) calc((var(--knob-angle) + 135deg)), rgba(71, 85, 105, 0.18) 270deg, transparent 270deg);
+  pointer-events: none;
+}
+.gain-knob:hover {
+  border-color: rgba(226, 232, 240, 0.54);
+  box-shadow:
+    inset 0 10px 18px rgba(255, 255, 255, 0.1),
+    inset 0 -18px 26px rgba(0, 0, 0, 0.66),
+    0 0 22px color-mix(in srgb, var(--knob-state-color) 34%, transparent),
+    0 15px 34px rgba(0, 0, 0, 0.42);
+}
+.gain-knob.is-dragging {
+  cursor: grabbing;
+  box-shadow:
+    inset 0 10px 18px rgba(255, 255, 255, 0.12),
+    inset 0 -18px 26px rgba(0, 0, 0, 0.66),
+    0 0 34px color-mix(in srgb, var(--knob-state-color) 62%, transparent),
+    0 18px 42px rgba(0, 0, 0, 0.5);
+}
+.gain-knob:focus-visible {
+  outline: 3px solid rgba(56, 189, 248, 0.7);
+  outline-offset: 5px;
+}
+.gain-knob.is-low { --knob-state-color: #7dd3fc; }
+.gain-knob.is-good { --knob-state-color: #4ade80; }
+.gain-knob.is-hot { --knob-state-color: #facc15; }
+.gain-knob.is-warning { --knob-state-color: #fb923c; }
+.gain-knob.is-clip,
+.gain-knob.is-clipping { --knob-state-color: #ef4444; }
+.knob-led-ring {
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.knob-led-ring span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(100, 116, 139, 0.62);
+  box-shadow: 0 0 7px rgba(15, 23, 42, 0.8);
+  transform: translate(-50%, -50%) rotate(var(--dot-angle)) translateY(-63px);
+}
+.knob-led-ring span.is-active {
+  background: var(--knob-state-color);
+  box-shadow: 0 0 10px var(--knob-state-color), 0 0 18px color-mix(in srgb, var(--knob-state-color) 55%, transparent);
+}
+.gain-knob__cap {
+  position: absolute;
+  inset: 13px;
+  border-radius: 50%;
+  border: 1px solid rgba(226, 232, 240, 0.14);
+  background:
+    radial-gradient(circle at 36% 28%, rgba(255, 255, 255, 0.22), transparent 16%),
+    repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.035) 0 1px, transparent 1px 4px),
+    radial-gradient(circle at 50% 54%, #334155 0 24%, #111827 66%, #020617 100%);
+}
+.gain-knob__mark {
+  position: absolute;
+  left: 50%;
+  top: 18px;
+  width: 4px;
+  height: 35px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.55);
+  transform: translateX(-50%) rotate(var(--knob-angle));
+  transform-origin: 50% 37px;
+}
+.sim-meter-row {
+  display: grid;
+  grid-template-columns: 46px repeat(2, 58px);
+  gap: 12px;
+  justify-content: center;
+  align-items: end;
+}
+.sim-meter-labels,
+.sim-meter-leds {
+  position: relative;
+  height: 300px;
+}
+.sim-meter-labels {
+  color: #94a3b8;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+.sim-meter-labels span {
+  position: absolute;
+  right: 0;
+  line-height: 1;
+  transform: translateY(50%);
+}
+.sim-meter {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  color: #cbd5e1;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+.sim-meter-leds {
+  width: 44px;
+  border-radius: 10px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.08), transparent 18% 82%, rgba(255,255,255,0.05)),
+    linear-gradient(180deg, #030712, #020617);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.62), 0 10px 22px rgba(0, 0, 0, 0.24);
+}
+.sim-target-zone {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  min-height: 12px;
+  border-radius: 999px;
+  background: rgba(125, 211, 252, 0.12);
+  border: 1px solid rgba(125, 211, 252, 0.26);
+  box-shadow: 0 0 22px rgba(56, 189, 248, 0.12);
+}
+.sim-peak-marker {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  height: 3px;
+  border-radius: 999px;
+  background: #fef3c7;
+  box-shadow: 0 0 12px rgba(254, 243, 199, 0.72), 0 0 4px rgba(255, 255, 255, 0.78);
+  transform: translateY(50%);
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+}
+.sim-led {
+  position: absolute;
+  left: 7px;
+  right: 7px;
+  height: 6px;
+  border-radius: 2px;
+  transform: translateY(50%);
+  opacity: 1;
+  transition: opacity 0.12s ease, filter 0.12s ease, box-shadow 0.12s ease;
+}
+.sim-led--green { background: linear-gradient(180deg, #4ade80, #16a34a); }
+.sim-led--yellow { background: linear-gradient(180deg, #fde68a, #eab308); }
+.sim-led--orange { background: linear-gradient(180deg, #fdba74, #ea580c); }
+.sim-led--red { background: linear-gradient(180deg, #ff4d5e, #dc2626 52%, #7f1d1d); }
+.sim-led--off {
+  opacity: 0.13;
+  filter: saturate(0.4);
+  background: rgba(148, 163, 184, 0.2);
+}
+.sim-led.active {
+  opacity: 1;
+  filter: saturate(1.15) brightness(1.08);
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.18);
+}
+.sim-led.current.sim-led--red {
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.9), 0 0 12px rgba(255,255,255,0.24);
+}
+/* Clip 時讓紅色 LED 有短促脈衝，模擬控台削波燈的即時警示感，不影響一般 meter 流暢度。 */
+.sim-meter-leds.is-clipping .sim-led--red.active {
+  animation: clipPulse 0.42s ease-in-out infinite alternate;
+}
+.clip-indicator {
+  min-height: 14px;
+  color: rgba(248, 113, 113, 0.24);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+.clip-indicator.is-clipping {
+  color: #fecaca;
+  text-shadow: 0 0 14px rgba(239, 68, 68, 0.95);
+}
+.stereo-meter .sim-meter-leds.is-clipping,
+.sim-meter-leds.is-clipping {
+  border-color: rgba(248, 113, 113, 0.44);
+  box-shadow: inset 0 0 22px rgba(127, 29, 29, 0.36), 0 0 24px rgba(239, 68, 68, 0.38);
+}
+@keyframes clipPulse {
+  from {
+    filter: saturate(1.2) brightness(1.08);
+    box-shadow: 0 0 18px rgba(239, 68, 68, 0.55);
+  }
+  to {
+    filter: saturate(1.55) brightness(1.32);
+    box-shadow: 0 0 32px rgba(239, 68, 68, 0.92), 0 0 10px rgba(254, 202, 202, 0.45);
+  }
+}
+.wing-fader {
+  --fader-position: 82%;
+  position: relative;
+  display: grid;
+  grid-template-columns: 72px 74px;
+  justify-content: center;
+  gap: 10px;
+  height: 300px;
+  margin: 2px 0;
+  touch-action: none;
+}
+.wing-fader.is-dragging .fader-track {
+  box-shadow: inset 0 0 26px rgba(0, 0, 0, 0.75), 0 0 24px rgba(56, 189, 248, 0.22), 0 12px 24px rgba(0, 0, 0, 0.28);
+}
+.fader-scale {
+  position: relative;
+  height: 100%;
+  color: #94a3b8;
+  font-size: 0.73rem;
+  font-weight: 900;
+}
+.fader-tick {
+  position: absolute;
+  right: 0;
+  transform: translateY(50%);
+  width: 100%;
+}
+.fader-tick i {
+  display: block;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 20px;
+  height: 1px;
+  border-radius: 999px;
+  background: rgba(226, 232, 240, 0.52);
+}
+.fader-tick b {
+  display: block;
+  padding-right: 28px;
+  color: #94a3b8;
+  font-weight: 900;
+  line-height: 1;
+  text-align: right;
+}
+.fader-tick--major i {
+  width: 28px;
+  height: 2px;
+  background: rgba(248, 250, 252, 0.82);
+}
+.fader-tick--minor {
+  right: 0;
+}
+.fader-tick--minor::before {
+  content: "";
+  display: block;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 13px;
+  height: 1px;
+  border-radius: 999px;
+  background: rgba(226, 232, 240, 0.34);
+}
+.fader-scale__unity {
+  color: #f8fafc;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+}
+.fader-scale__unity i {
+  height: 3px;
+  width: 34px;
+  background: #fb923c;
+  box-shadow: 0 0 12px rgba(251, 146, 60, 0.8);
+}
+.fader-scale__unity b {
+  color: #f8fafc;
+}
+.fader-track {
+  position: relative;
+  height: 100%;
+  width: 74px;
+  border-radius: 14px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.07), rgba(15,23,42,0.14) 18%, rgba(2,6,23,0.72) 42% 58%, rgba(15,23,42,0.14) 82%, rgba(255,255,255,0.06)),
+    linear-gradient(180deg, #1f2937, #0f172a 48%, #020617);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: inset 0 0 26px rgba(0, 0, 0, 0.75), 0 12px 24px rgba(0, 0, 0, 0.28);
+}
+.fader-line {
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 50%;
+  width: 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #020617, #050816 50%, #020617);
+  border: 1px solid rgba(0, 0, 0, 0.65);
+  box-shadow: inset 0 0 12px rgba(0,0,0,0.95), 0 0 7px rgba(226,232,240,0.08);
+  transform: translateX(-50%);
+}
+.fader-unity {
+  position: absolute;
+  left: 13px;
+  right: 13px;
+  bottom: 82%;
+  height: 3px;
+  border-radius: 999px;
+  background: #fb923c;
+  box-shadow: 0 0 12px rgba(251, 146, 60, 0.75);
+}
+.fader-cap {
+  position: absolute;
+  left: 50%;
+  bottom: var(--fader-position);
+  width: 88px;
+  height: 52px;
+  border-radius: 8px;
+  border: 1px solid rgba(248, 250, 252, 0.68);
+  background:
+    linear-gradient(90deg, rgba(15,23,42,0.2), transparent 16% 84%, rgba(15,23,42,0.28)),
+    linear-gradient(180deg, #f8fafc 0%, #d1d5db 38%, #9ca3af 62%, #e5e7eb 100%);
+  box-shadow: inset 0 3px 5px rgba(255,255,255,0.82), inset 0 -6px 10px rgba(15,23,42,0.26), 0 14px 24px rgba(0,0,0,0.5);
+  transform: translate(-50%, 50%);
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+}
+.wing-fader.is-dragging .fader-cap {
+  cursor: grabbing;
+}
+.fader-cap span {
+  position: absolute;
+  left: 9px;
+  right: 9px;
+  top: 50%;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.72);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.7);
+}
+.output-fader {
+  position: absolute;
+  inset: 0 0 0 82px;
+  width: 74px;
+  height: 300px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  pointer-events: none;
+  writing-mode: vertical-lr;
+  direction: rtl;
+}
+.sim-status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+.sim-status {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(17, 24, 39, 0.78);
+}
+.sim-status strong {
+  color: #cbd5e1;
+}
+.sim-status span {
+  color: #f8fafc;
+  font-weight: 800;
+}
+.sim-status.is-low { border-color: rgba(96, 165, 250, 0.45); background: rgba(30, 64, 175, 0.14); }
+.sim-status.is-good { border-color: rgba(74, 222, 128, 0.42); background: rgba(22, 101, 52, 0.16); }
+.sim-status.is-hot { border-color: rgba(251, 191, 36, 0.48); background: rgba(133, 77, 14, 0.16); }
+.sim-status.is-warning { border-color: rgba(249, 115, 22, 0.55); background: rgba(154, 52, 18, 0.18); }
+.sim-status.is-clip { border-color: rgba(248, 113, 113, 0.68); background: rgba(127, 29, 29, 0.28); }
+.sim-lesson {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(2, 6, 23, 0.26);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+.sim-lesson span {
+  color: #38bdf8;
+  font-weight: 900;
+}
+.sim-lesson p {
+  margin: 0;
+  color: #cbd5e1;
+  line-height: 1.7;
+}

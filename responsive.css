@@ -1,0 +1,312 @@
+﻿/* responsive.css：所有斷點集中最後載入，確保手機 Drawer、平板與手機版覆寫順序一致。 */
+@media (max-width: 1100px) {
+  .simulator-header {
+    display: grid;
+  }
+  .simulator-source {
+    max-width: 100%;
+    text-align: left;
+    justify-self: start;
+  }
+  .simulator-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .pfl-visualizer {
+    --pfl-segment-height: 6px;
+    --pfl-segment-half: 3px;
+    grid-template-columns: 56px 88px minmax(0, 1fr);
+    align-items: center;
+    justify-content: start;
+    column-gap: 14px;
+    row-gap: 16px;
+  }
+  .detail-group--meter {
+    width: 100%;
+  }
+  .detail-header {
+    grid-template-columns: minmax(0, 1fr) 72px;
+    gap: 14px;
+    min-height: 72px;
+  }
+  .detail-title {
+    text-align: left;
+  }
+  .detail-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 16px;
+  }
+  .detail-icon svg {
+    width: 50px;
+    height: 50px;
+  }
+  .pfl-visualizer__labels {
+    height: 320px;
+  }
+  .pfl-visualizer__labels span {
+    text-align: right;
+    width: 100%;
+    min-width: 0;
+    font-size: 0.75rem;
+  }
+  .pfl-visualizer__meter {
+    height: 320px;
+    min-height: 320px;
+    width: 84px;
+  }
+  .pfl-visualizer__info {
+    grid-column: 3;
+    order: 0;
+    width: auto;
+    align-self: center;
+    padding: 12px;
+    border-radius: 16px;
+  }
+  .pfl-info-row {
+    gap: 4px;
+  }
+  .pfl-info-row strong {
+    display: block;
+    text-align: right;
+  }
+}
+
+@media (max-width: 768px) {
+  main {
+    padding: 16px;
+  }
+  .simulator-card {
+    display: grid;
+    gap: 14px;
+    padding: 18px;
+    border-radius: 20px;
+  }
+  .simulator-grid {
+    grid-template-columns: 1fr;
+  }
+  .sim-status-grid {
+    grid-template-columns: 1fr;
+  }
+  .simulator-header {
+    order: 0;
+    margin-bottom: 0;
+  }
+  /* 窄版把英中標題拆成上下兩行，避免中文被擠在英文後半段產生不自然斷行。 */
+  .bilingual-title,
+  .title-en,
+  .title-zh {
+    display: block;
+  }
+  .title-zh {
+    margin-left: 0;
+    margin-top: 2px;
+  }
+  /* 手機版把兩個 wrapper 展開成同一層，並讓警告框排在 meter 上方，使用者先看到狀態再看電平。 */
+  .simulator-grid,
+  .sim-status-grid {
+    display: contents;
+  }
+  .sim-panel--gain { order: 1; }
+  #inputStatusBox { order: 2; }
+  .sim-panel--meter { order: 3; }
+  .sim-panel--fader { order: 4; }
+  #outputStatusBox { order: 5; }
+  .sim-panel--output { order: 6; }
+  .sim-lesson {
+    order: 7;
+    margin-top: 0;
+  }
+  .sim-status {
+    margin-top: 0;
+  }
+  .sim-panel {
+    padding: 16px;
+  }
+  .gain-knob {
+    width: 88px;
+    height: 88px;
+  }
+  .knob-led-ring span {
+    transform: translate(-50%, -50%) rotate(var(--dot-angle)) translateY(-51px);
+  }
+  .gain-knob__cap {
+    inset: 11px;
+  }
+  .gain-knob__mark {
+    top: 15px;
+    height: 27px;
+    transform-origin: 50% 29px;
+  }
+  .sim-meter-row {
+    grid-template-columns: 42px repeat(2, minmax(58px, 76px));
+    gap: 10px;
+  }
+  .sim-meter-labels,
+  .sim-meter-leds {
+    height: 270px;
+  }
+  .sim-meter-leds {
+    width: 48px;
+  }
+  .wing-fader,
+  .output-fader {
+    height: 270px;
+  }
+  .sim-panel--fader {
+    justify-items: center;
+    text-align: center;
+  }
+  .control-value {
+    margin-top: 14px;
+  }
+  .floating-sim-button {
+    right: 14px;
+    bottom: 14px;
+    gap: 8px;
+    padding: 9px 13px 9px 10px;
+    font-size: 0.9rem;
+  }
+  .floating-knob-icon {
+    width: 24px;
+    height: 24px;
+  }
+  .floating-knob-pointer {
+    top: 6px;
+    height: 8px;
+    transform-origin: 50% 8px;
+  }
+  .picker-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    top: 10px;
+    z-index: 60;
+    min-height: 44px;
+    margin: 0 0 12px;
+    border: 1px solid rgba(125, 211, 252, 0.45);
+    border-radius: 999px;
+    padding: 10px 16px;
+    background: rgba(14, 165, 233, 0.16);
+    color: #e0f2fe;
+    font-weight: 800;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.24);
+  }
+  .picker-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    pointer-events: none;
+    background: rgba(2, 6, 23, 0);
+    transition: background 0.2s ease;
+  }
+  body.picker-open {
+    overflow: hidden;
+  }
+  body.picker-open .picker-backdrop {
+    pointer-events: auto;
+    background: rgba(2, 6, 23, 0.58);
+  }
+  .control-panel,
+  .instrument-list {
+    position: fixed;
+    left: 0;
+    width: min(86vw, 340px);
+    z-index: 80;
+    margin: 0;
+    border-radius: 0;
+    transform: translateX(-104%);
+    transition: transform 0.24s ease;
+    box-shadow: 18px 0 60px rgba(0, 0, 0, 0.38);
+  }
+  .control-panel {
+    top: 0;
+    min-height: 126px;
+    max-height: 40vh;
+    overflow: auto;
+    padding: 18px;
+    background: rgba(15, 23, 42, 0.98);
+    border-right: 1px solid rgba(148, 163, 184, 0.16);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  }
+  .filters {
+    gap: 8px;
+  }
+  .filters button {
+    padding: 9px 13px;
+  }
+  .instrument-list {
+    top: min(40vh, 168px);
+    bottom: 0;
+    overflow: auto;
+    padding: 18px;
+    background: rgba(15, 23, 42, 0.98);
+    border-right: 1px solid rgba(148, 163, 184, 0.16);
+  }
+  body.picker-open .control-panel,
+  body.picker-open .instrument-list {
+    transform: translateX(0);
+  }
+  .layout {
+    margin-top: 0;
+  }
+  .pfl-visualizer {
+    grid-template-columns: 46px 64px minmax(138px, 1fr);
+    column-gap: 10px;
+    align-items: center;
+  }
+  .pfl-visualizer__labels {
+    height: 320px;
+  }
+  .pfl-visualizer__meter {
+    width: 64px;
+  }
+  .pfl-visualizer__info {
+    grid-column: 3;
+    order: 0;
+    width: auto;
+    align-self: center;
+    padding: 12px;
+    border-radius: 16px;
+  }
+  .detail-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .detail-header,
+  .detail-group--meter,
+  .detail-group--mic,
+  .detail-group--models,
+  .detail-note {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .about-modal {
+    padding: 14px;
+  }
+  .about-modal__panel {
+    max-height: 86vh;
+    padding: 22px;
+    border-radius: 18px;
+  }
+  .about-modal__grid {
+    grid-template-columns: 1fr;
+  }
+  .about-modal h2 {
+    margin-right: 42px;
+  }
+}
+@media (max-width: 1100px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .detail-panel {
+    position: static;
+    order: -1;
+  }
+  .instrument-list {
+    order: 0;
+  }
+}

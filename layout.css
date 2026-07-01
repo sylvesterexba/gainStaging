@@ -1,0 +1,60 @@
+﻿/* layout.css：管理頁面骨架、主要區塊與清單容器，不包含元件細節。 */
+header {
+  padding: 32px 24px 16px;
+  text-align: center;
+  background: rgba(15, 23, 42, 0.95);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+header h1 {
+  margin: 0;
+  font-size: clamp(2rem, 3vw, 3rem);
+}
+header p {
+  margin: 12px auto 0;
+  max-width: 700px;
+  color: #cbd5e1;
+}
+main {
+  padding: 24px;
+}
+.picker-toggle,
+.picker-backdrop {
+  display: none;
+}
+.control-panel {
+  display: grid;
+  max-width: 1080px;
+  margin: 0 auto 24px;
+  justify-items: center;
+}
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.25fr);
+  gap: 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.instrument-list {
+  background: rgba(15, 23, 42, 0.95);
+  border-radius: 24px;
+  padding: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+.instrument-list h2 {
+  margin-top: 0;
+}
+
+/* Footer 留在 layout，保持頁面外框與內容模組分離。 */
+footer {
+  margin: 32px auto 0;
+  max-width: 1080px;
+  padding: 16px 24px;
+  text-align: center;
+  color: #94a3b8;
+}

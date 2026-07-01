@@ -42,7 +42,12 @@
 ## 檔案結構
 
 - `index.html`：頁面結構
-- `styles.css`：介面樣式與響應式排版
+- `base.css`：reset、body、基本文字與共用標題規則
+- `layout.css`：header、main、頁面 grid、控制區、清單容器與 footer
+- `components.css`：按鈕、分類按鈕、項目卡片、mic chip、警告提示、Modal 與浮動按鈕
+- `detail.css`：Detail Panel、Detail Card、Detail Icon、RMS / Peak 參考圖示與 PFL visualizer
+- `simulator.css`：Gain Staging Simulator、Gain Knob、Input Meter、Output Fader、Stereo Meter 與狀態教學
+- `responsive.css`：所有 media query、手機 Drawer、平板與手機版 Detail / Simulator 排列
 - `data.js`：樂器 / 聲源資料、分類標籤、Meter 與 Fader 固定設定
 - `icons.js`：樂器與麥克風類型圖示
 - `simulator.js`：Gain Staging Simulator、Input / Output Meter、Fader 與即時動畫
