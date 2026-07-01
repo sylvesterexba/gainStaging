@@ -920,16 +920,37 @@ function updateFloatingButtonState() {
 function updateFloatingKnobIcon() {
   if (!floatingSimButton) return;
   const gainRatio = clamp(currentGain / 60, 0, 1);
-  const angle = -135 + gainRatio * 270;
-  const ledAngle = gainRatio * 270;
+  const pointerAngle = -135 + gainRatio * 270;
+  const gainArcDeg = gainRatio * 270;
+  const statusLevel = getInputStatusLevel();
+  const statusColorMap = {
+    low: "#7dd3fc",
+    good: "#4ade80",
+    warning: "#fb923c",
+    clip: "#ef4444"
+  };
+  const statusLabelMap = {
+    low: "訊號偏低",
+    good: "建議範圍",
+    warning: "訊號偏熱",
+    clip: "Clip"
+  };
 
-  // 浮動旋鈕跟主 Gain 使用同一組角度公式，避免兩個入口顯示不同狀態造成使用者混淆。
-  floatingSimButton.style.setProperty("--floating-knob-angle", `${angle}deg`);
-  floatingSimButton.style.setProperty("--floating-gain-angle", `${ledAngle}deg`);
-  floatingSimButton.dataset.status = inputStatus;
+  // 浮動旋鈕跟主 Gain 使用同一組角度與狀態來源，避免捲動按鈕文字切換時覆蓋真實電平狀態。
+  floatingSimButton.style.setProperty("--floating-knob-rotation", `${pointerAngle}deg`);
+  floatingSimButton.style.setProperty("--floating-gain-angle", `${gainArcDeg}deg`);
+  floatingSimButton.style.setProperty("--floating-gain-color", statusColorMap[statusLevel]);
+  floatingSimButton.dataset.status = statusLevel;
+  floatingSimButton.classList.remove(
+    "floating-knob-low",
+    "floating-knob-good",
+    "floating-knob-warning",
+    "floating-knob-clip"
+  );
+  floatingSimButton.classList.add(`floating-knob-${statusLevel}`);
 
   const isAtSimulator = floatingSimButton.classList.contains("is-at-simulator");
-  const gainText = `目前 Gain +${Math.round(currentGain)} dB`;
+  const gainText = `目前 Gain +${Math.round(currentGain)} dB，狀態：${statusLabelMap[statusLevel]}`;
   floatingSimButton.setAttribute(
     "aria-label",
     isAtSimulator ? `回到頁面上方，${gainText}` : `前往增益級距模擬器，${gainText}`
@@ -1209,6 +1230,7 @@ function updateInputMeter() {
   updateSimulatorMeter(inputRmsMeter, simulatedInputRMS);
   updateSimulatorMeter(inputPeakMeter, simulatedInputPeak);
   updatePeakHoldMarker(inputPeakMeter, simulatorPeakHolds.inputPeak.value);
+  updateFloatingKnobIcon();
 }
 
 function updateFader() {
@@ -1241,18 +1263,16 @@ function setStatusClass(node, status) {
   node.classList.add(`is-${status}`);
 }
 
+function getInputStatusLevel() {
+  // 直接從即時 Peak 推導狀態，不依賴上一輪 inputStatus，拖曳 Gain 時浮動旋鈕才不會慢半拍。
+  if (simulatedInputPeak >= 0) return "clip";
+  if (simulatedInputPeak > -3 || simulatedInputPeak > simulatorProfile.peakHigh) return "warning";
+  if (simulatedInputPeak < simulatorProfile.peakLow) return "low";
+  return "good";
+}
+
 function updateStatusMessage() {
-  if (simulatedInputPeak >= 0) {
-    inputStatus = "clip";
-  } else if (simulatedInputPeak > -3) {
-    inputStatus = "warning";
-  } else if (simulatedInputPeak > simulatorProfile.peakHigh) {
-    inputStatus = "hot";
-  } else if (simulatedInputPeak < simulatorProfile.peakLow) {
-    inputStatus = "low";
-  } else {
-    inputStatus = "good";
-  }
+  inputStatus = getInputStatusLevel();
 
   const outputPeak = Math.max(simulatedOutputL, simulatedOutputR);
   if (outputPeak >= 0) {
