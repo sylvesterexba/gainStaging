@@ -14,11 +14,11 @@ const instruments = [
     name: "Male Vocal 男主唱",
     category: "vocal",
     rms: "-24 ~ -18 dBFS",
-    peak: "-12 ~ -9 dBFS",
-    headroom: "約 9~12 dB",
+    peak: "-12 ~ -6 dBFS",
+    headroom: "約 6~12 dB",
     micType: "動圈 / 電容",
     models: "SM58, e865, KSM9, NT1-A",
-    note: "人聲建議峰值落在 -12 到 -9 dBFS，保留足夠 headroom，避免 0 dBFS 飽和。"
+    note: "人聲建議峰值落在 -12 到 -6 dBFS，保留足夠 headroom，避免 0 dBFS 飽和。"
   },
   {
     name: "Female Vocal 女主唱",
@@ -282,14 +282,58 @@ const pickerToggle = document.getElementById("pickerToggle");
 const pickerBackdrop = document.getElementById("pickerBackdrop");
 const searchInput = document.getElementById("search");
 const filterButtons = document.querySelectorAll(".filters button");
+const simulatorSource = document.getElementById("simulatorSource");
+const gainKnob = document.getElementById("gainKnob");
+const knobLedRing = document.getElementById("knobLedRing");
+const gainValue = document.getElementById("gainValue");
+const inputReadout = document.getElementById("inputReadout");
+const inputRmsMeter = document.getElementById("inputRmsMeter");
+const inputPeakMeter = document.getElementById("inputPeakMeter");
+const simInputLabels = document.getElementById("simInputLabels");
+const outputFader = document.getElementById("outputFader");
+const wingFader = document.getElementById("wingFader");
+const faderCap = document.getElementById("faderCap");
+const faderValue = document.getElementById("faderValue");
+const outputReadout = document.getElementById("outputReadout");
+const outputLeftMeter = document.getElementById("outputLeftMeter");
+const outputRightMeter = document.getElementById("outputRightMeter");
+const outputLeftClip = document.getElementById("outputLeftClip");
+const outputRightClip = document.getElementById("outputRightClip");
+const simOutputLabels = document.getElementById("simOutputLabels");
+const inputStatusBox = document.getElementById("inputStatusBox");
+const outputStatusBox = document.getElementById("outputStatusBox");
+const inputStatusMessage = document.getElementById("inputStatusMessage");
+const outputStatusMessage = document.getElementById("outputStatusMessage");
 let selectedCategory = "all";
 let activeItem = null;
 const pflMeterMarks = [0, -1, -2, -3, -4, -6, -8, -10, -12, -15, -18, -24, -30, -36, -42, -48, -54, -60];
 const pflSegments = [...pflMeterMarks];
 const pflLabelValues = ["CLIP", -1, -2, -3, -4, -6, -8, -10, -12, -15, -18, -24, -30, -36, -42, -48, -54, -60];
+const simulatorMeterMarks = [0, -1, -2, -3, -4, -6, -8, -10, -12, -15, -18, -24, -30, -36, -42, -48, -54, -60];
 let pflSegmentElems = [];
 let pflFill = null;
 let pflAnimationLast = null;
+let currentGain = 28;
+let currentFader = 0;
+let simulatedInputRMS = -24;
+let simulatedInputPeak = -9;
+let simulatedOutputL = -9;
+let simulatedOutputR = -10;
+let inputStatus = "good";
+let outputStatus = "good";
+let simulatorAnimationLast = null;
+let simulatorNoisePhase = 0;
+let stereoDifference = 0.9;
+let simulatorProfile = {
+  rmsLow: -24,
+  rmsHigh: -18,
+  peakLow: -12,
+  peakHigh: -6,
+  idealGain: 28,
+  sourceRmsAtZero: -49,
+  sourcePeakAtZero: -37
+};
+const simulatorMeters = new Map();
 const pflMeterState = {
   value: -20,
   target: -18,
@@ -538,6 +582,7 @@ function selectItem(card, item) {
     ? `<div class="warning-note"><strong>削波警告</strong><span>${item.note}</span><span>處理：降低 Preamp Gain / Trim / 來源音量，避免紅燈停留在 0 dBFS。</span></div>`
     : item.note;
   setPflTarget(item);
+  setSimulatorProfile(item);
 }
 
 function setPflTarget(item) {
@@ -733,6 +778,378 @@ function formatDb(value) {
 
 // Legacy PFL tower rendering has been removed because the new detail panel meter drives directly from selected item data.
 
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function formatSignedDb(value, digits = 0) {
+  if (value <= -59.5) return "-∞";
+  const rounded = Number(value.toFixed(digits));
+  const sign = rounded > 0 ? "+" : "";
+  return `${sign}${rounded.toFixed(digits)} dB`;
+}
+
+function formatDbfs(value) {
+  const rounded = Math.round(value * 10) / 10;
+  const sign = rounded > 0 ? "+" : "";
+  return `${sign}${Number.isInteger(rounded) ? rounded : rounded.toFixed(1)} dBFS`;
+}
+
+function getSimulatorSegmentColor(threshold) {
+  if (threshold >= -1) return "red";
+  if (threshold >= -6) return "orange";
+  if (threshold >= -18) return "yellow";
+  return "green";
+}
+
+function getSimulatorMeterBottom(value) {
+  const db = value === "CLIP" ? 0 : Number(value);
+  const percent = getSimulatorMeterPercent(db);
+  return `clamp(4px, ${percent}%, calc(100% - 4px))`;
+}
+
+function getSimulatorMeterPercent(value) {
+  const db = clamp(Number(value), -60, 0);
+  const exactIndex = simulatorMeterMarks.indexOf(db);
+  if (exactIndex >= 0) {
+    return (1 - exactIndex / (simulatorMeterMarks.length - 1)) * 100;
+  }
+
+  for (let index = 0; index < simulatorMeterMarks.length - 1; index += 1) {
+    const upper = simulatorMeterMarks[index];
+    const lower = simulatorMeterMarks[index + 1];
+    if (db <= upper && db >= lower) {
+      const segmentProgress = (upper - db) / (upper - lower);
+      const virtualIndex = index + segmentProgress;
+      return (1 - virtualIndex / (simulatorMeterMarks.length - 1)) * 100;
+    }
+  }
+
+  return db >= 0 ? 100 : 0;
+}
+
+function createSimulatorMeter(container) {
+  if (!container) return [];
+
+  container.innerHTML = "<div class=\"sim-target-zone\"></div>";
+  simulatorMeterMarks.forEach((threshold) => {
+    const segment = document.createElement("div");
+    segment.className = `sim-led sim-led--${getSimulatorSegmentColor(threshold)} sim-led--off`;
+    segment.dataset.threshold = threshold;
+    segment.style.bottom = getSimulatorMeterBottom(threshold);
+    container.appendChild(segment);
+  });
+
+  const segments = Array.from(container.querySelectorAll(".sim-led"));
+  simulatorMeters.set(container.id, {
+    container,
+    target: container.querySelector(".sim-target-zone"),
+    segments
+  });
+  return segments;
+}
+
+function updateSimulatorTargetZones() {
+  const peakBottom = getSimulatorMeterPercent(simulatorProfile.peakLow);
+  const peakTop = getSimulatorMeterPercent(simulatorProfile.peakHigh);
+  const rmsBottom = getSimulatorMeterPercent(simulatorProfile.rmsLow);
+  const rmsTop = getSimulatorMeterPercent(simulatorProfile.rmsHigh);
+  const zoneMap = [
+    [inputRmsMeter, rmsBottom, rmsTop],
+    [inputPeakMeter, peakBottom, peakTop],
+    [outputLeftMeter, peakBottom, peakTop],
+    [outputRightMeter, peakBottom, peakTop]
+  ];
+
+  zoneMap.forEach(([meter, bottom, top]) => {
+    if (!meter) return;
+    const zone = meter.querySelector(".sim-target-zone");
+    if (!zone) return;
+    zone.style.bottom = `${bottom}%`;
+    zone.style.height = `${Math.max(2, top - bottom)}%`;
+  });
+}
+
+function updateSimulatorMeter(container, value) {
+  const meter = simulatorMeters.get(container && container.id);
+  if (!meter) return;
+  const meterValue = clamp(value, -60, 0);
+  let currentIndex = -1;
+  let currentThreshold = -Infinity;
+
+  meter.segments.forEach((segment, index) => {
+    const threshold = Number(segment.dataset.threshold);
+    const active = meterValue >= threshold;
+    segment.classList.toggle("active", active);
+    segment.classList.toggle("sim-led--off", !active);
+    if (active && threshold > currentThreshold) {
+      currentIndex = index;
+      currentThreshold = threshold;
+    }
+  });
+
+  meter.segments.forEach((segment, index) => {
+    segment.classList.toggle("current", index === currentIndex);
+  });
+}
+
+function setSimulatorProfile(item) {
+  if (!item) return;
+  const profile = getItemMeterProfile(item);
+  const peakCenter = (profile.peakLow + profile.peakHigh) / 2;
+  const rmsCenter = (profile.rmsLow + profile.rmsHigh) / 2;
+  const idealGain = item.name.includes("Male Vocal") ? 28 : clamp(28 + (peakCenter + 9) * 0.7, 18, 42);
+
+  simulatorProfile = {
+    ...profile,
+    idealGain,
+    sourcePeakAtZero: peakCenter - idealGain,
+    sourceRmsAtZero: rmsCenter - idealGain
+  };
+  currentGain = idealGain;
+  currentFader = 0;
+  simulatedInputRMS = rmsCenter;
+  simulatedInputPeak = peakCenter;
+  simulatedOutputL = peakCenter;
+  simulatedOutputR = peakCenter - stereoDifference;
+  simulatorNoisePhase = Math.random() * Math.PI * 2;
+  stereoDifference = randomBetween(0.5, 1.5);
+
+  if (simulatorSource) simulatorSource.textContent = `目前聲源：${item.name}`;
+  if (outputFader) outputFader.value = String(currentFader);
+  updateSimulatorTargetZones();
+  updateKnob();
+  updateFader();
+  updateInputMeter();
+  updateStereoMeter();
+  updateStatusMessage();
+}
+
+function updateKnob() {
+  if (!gainKnob || !gainValue) return;
+  const rotation = -135 + (currentGain / 60) * 270;
+  gainKnob.style.setProperty("--knob-rotation", `${rotation}deg`);
+  gainKnob.style.setProperty("--knob-angle", `${rotation}deg`);
+  gainKnob.setAttribute("aria-valuenow", String(Math.round(currentGain)));
+  gainValue.textContent = `GAIN +${Math.round(currentGain)} dB`;
+
+  if (knobLedRing) {
+    const dots = Array.from(knobLedRing.children);
+    const activeCount = Math.round((currentGain / 60) * dots.length);
+    dots.forEach((dot, index) => {
+      dot.classList.toggle("is-active", index < activeCount);
+    });
+  }
+}
+
+function updateInputMeter() {
+  updateSimulatorMeter(inputRmsMeter, simulatedInputRMS);
+  updateSimulatorMeter(inputPeakMeter, simulatedInputPeak);
+  if (inputReadout) {
+    inputReadout.textContent = `RMS ${formatDbfs(simulatedInputRMS)} / Peak ${formatDbfs(simulatedInputPeak)}`;
+  }
+}
+
+function updateFader() {
+  if (faderValue) {
+    faderValue.textContent = `FADER ${formatSignedDb(currentFader, 1)}`;
+  }
+  if (outputFader && Number(outputFader.value) !== currentFader) {
+    outputFader.value = String(currentFader);
+  }
+  const faderPosition = ((currentFader + 60) / 70) * 100;
+  if (wingFader) wingFader.style.setProperty("--fader-position", `${faderPosition}%`);
+  if (faderCap) faderCap.style.bottom = `clamp(10px, ${faderPosition}%, calc(100% - 10px))`;
+}
+
+function updateStereoMeter() {
+  updateSimulatorMeter(outputLeftMeter, simulatedOutputL);
+  updateSimulatorMeter(outputRightMeter, simulatedOutputR);
+  outputLeftMeter?.classList.toggle("is-clipping", simulatedOutputL >= 0);
+  outputRightMeter?.classList.toggle("is-clipping", simulatedOutputR >= 0);
+  outputLeftClip?.classList.toggle("is-clipping", simulatedOutputL >= 0);
+  outputRightClip?.classList.toggle("is-clipping", simulatedOutputR >= 0);
+  if (outputReadout) {
+    outputReadout.textContent = `L ${formatDbfs(simulatedOutputL)} / R ${formatDbfs(simulatedOutputR)}`;
+  }
+}
+
+function setStatusClass(node, status) {
+  if (!node) return;
+  node.classList.remove("is-low", "is-good", "is-hot", "is-warning", "is-clip");
+  node.classList.add(`is-${status}`);
+}
+
+function updateStatusMessage() {
+  if (simulatedInputPeak >= 0) {
+    inputStatus = "clip";
+  } else if (simulatedInputPeak > -3) {
+    inputStatus = "warning";
+  } else if (simulatedInputPeak > simulatorProfile.peakHigh) {
+    inputStatus = "hot";
+  } else if (simulatedInputPeak < simulatorProfile.peakLow) {
+    inputStatus = "low";
+  } else {
+    inputStatus = "good";
+  }
+
+  const outputPeak = Math.max(simulatedOutputL, simulatedOutputR);
+  if (outputPeak >= 0) {
+    outputStatus = "clip";
+  } else if (outputPeak > -1) {
+    outputStatus = "warning";
+  } else if (outputPeak > -3) {
+    outputStatus = "hot";
+  } else {
+    outputStatus = "good";
+  }
+
+  const inputMessages = {
+    low: "訊號偏低，可能需要增加 Gain。",
+    good: "建議範圍：Gain 設定良好。",
+    hot: "訊號偏熱，注意 Headroom。",
+    warning: "警告：Peak 接近 Clip。",
+    clip: "CLIP：輸入已到達 0 dBFS，請降低 Gain。"
+  };
+  const outputMessages = {
+    good: "Output 安全，Fader 可用來做混音平衡。",
+    hot: "Output 偏熱，注意主輸出 Headroom。",
+    warning: "警告：Output 接近 Clip，請降低 Fader。",
+    clip: "OUTPUT CLIP：輸出已超過 0 dBFS。",
+    low: "Output 偏低。"
+  };
+
+  if (inputStatusMessage) inputStatusMessage.textContent = inputMessages[inputStatus];
+  if (outputStatusMessage) outputStatusMessage.textContent = outputMessages[outputStatus];
+  setStatusClass(inputStatusBox, inputStatus);
+  setStatusClass(outputStatusBox, outputStatus);
+  setStatusClass(gainKnob, inputStatus);
+  gainKnob?.classList.toggle("is-clipping", inputStatus === "clip");
+}
+
+function updateSimulatorFrame(timestamp) {
+  if (!simulatorAnimationLast) simulatorAnimationLast = timestamp;
+  const dt = Math.min((timestamp - simulatorAnimationLast) / 1000, 0.08);
+  simulatorAnimationLast = timestamp;
+
+  const slowMotion = Math.sin(timestamp * 0.0016 + simulatorNoisePhase) * 0.75;
+  const fastMotion = Math.sin(timestamp * 0.009 + simulatorNoisePhase * 0.5) * 0.55;
+  const transient = Math.random() < 0.08 ? randomBetween(0.4, 2.2) : randomBetween(-0.4, 0.7);
+  const targetRms = simulatorProfile.sourceRmsAtZero + currentGain + slowMotion + randomBetween(-0.25, 0.25);
+  const targetPeak = simulatorProfile.sourcePeakAtZero + currentGain + fastMotion + transient;
+  const rmsAlpha = 1 - Math.pow(0.05, dt);
+  const peakAlpha = targetPeak > simulatedInputPeak ? 1 - Math.pow(0.002, dt) : 1 - Math.pow(0.08, dt);
+
+  simulatedInputRMS += (targetRms - simulatedInputRMS) * rmsAlpha;
+  simulatedInputPeak += (targetPeak - simulatedInputPeak) * peakAlpha;
+
+  const outputBase = simulatedInputPeak + currentFader;
+  const drift = Math.sin(timestamp * 0.0027) * 0.25;
+  simulatedOutputL = outputBase + stereoDifference / 2 + drift;
+  simulatedOutputR = outputBase - stereoDifference / 2 - drift;
+
+  updateInputMeter();
+  updateStereoMeter();
+  updateStatusMessage();
+  requestAnimationFrame(updateSimulatorFrame);
+}
+
+function adjustGain(delta) {
+  currentGain = clamp(currentGain + delta, 0, 60);
+  updateKnob();
+}
+
+function bindGainKnob() {
+  if (!gainKnob) return;
+  let dragStart = null;
+
+  gainKnob.addEventListener("pointerdown", (event) => {
+    dragStart = {
+      x: event.clientX,
+      y: event.clientY,
+      gain: currentGain
+    };
+    gainKnob.setPointerCapture(event.pointerId);
+    gainKnob.classList.add("is-dragging");
+  });
+
+  gainKnob.addEventListener("pointermove", (event) => {
+    if (!dragStart) return;
+    const delta = (dragStart.y - event.clientY + event.clientX - dragStart.x) * 0.22;
+    currentGain = clamp(dragStart.gain + delta, 0, 60);
+    updateKnob();
+  });
+
+  ["pointerup", "pointercancel"].forEach((eventName) => {
+    gainKnob.addEventListener(eventName, (event) => {
+      dragStart = null;
+      gainKnob.classList.remove("is-dragging");
+      if (gainKnob.hasPointerCapture(event.pointerId)) {
+        gainKnob.releasePointerCapture(event.pointerId);
+      }
+    });
+  });
+
+  gainKnob.addEventListener("wheel", (event) => {
+    event.preventDefault();
+    adjustGain(event.deltaY < 0 ? 1 : -1);
+  }, { passive: false });
+
+  gainKnob.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowUp" || event.key === "ArrowRight") {
+      event.preventDefault();
+      adjustGain(event.shiftKey ? 5 : 1);
+    }
+    if (event.key === "ArrowDown" || event.key === "ArrowLeft") {
+      event.preventDefault();
+      adjustGain(event.shiftKey ? -5 : -1);
+    }
+  });
+}
+
+function bindOutputFader() {
+  if (!outputFader) return;
+  outputFader.addEventListener("input", () => {
+    currentFader = Number(outputFader.value);
+    updateFader();
+    updateStereoMeter();
+    updateStatusMessage();
+  });
+}
+
+function initKnobLedRing() {
+  if (!knobLedRing) return;
+  knobLedRing.innerHTML = "";
+  const dotCount = 27;
+  for (let index = 0; index < dotCount; index += 1) {
+    const dot = document.createElement("span");
+    dot.style.setProperty("--dot-angle", `${-135 + (270 / (dotCount - 1)) * index}deg`);
+    knobLedRing.appendChild(dot);
+  }
+}
+
+function initSimulator() {
+  if (!gainKnob) return;
+
+  if (simInputLabels) {
+    simInputLabels.innerHTML = ["CLIP", -1, -2, -3, -4, -6, -8, -10, -12, -15, -18, -24, -30, -36, -42, -48, -54, -60]
+      .map((value) => `<span style="bottom: ${getSimulatorMeterBottom(value)}">${value}</span>`)
+      .join("");
+  }
+  if (simOutputLabels) {
+    simOutputLabels.innerHTML = simInputLabels ? simInputLabels.innerHTML : "";
+  }
+
+  [inputRmsMeter, inputPeakMeter, outputLeftMeter, outputRightMeter].forEach(createSimulatorMeter);
+  initKnobLedRing();
+  bindGainKnob();
+  bindOutputFader();
+  updateSimulatorTargetZones();
+  updateKnob();
+  updateFader();
+  requestAnimationFrame(updateSimulatorFrame);
+}
+
 function categoryLabel(category) {
   const map = {
     vocal: "人聲",
@@ -776,5 +1193,6 @@ filterButtons.forEach((button) => {
   });
 });
 
+initSimulator();
 renderItems();
 initPflMeter();

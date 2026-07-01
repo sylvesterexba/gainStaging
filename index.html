@@ -83,6 +83,111 @@
         </div>
       </aside>
     </section>
+
+    <section class="simulator-card" aria-labelledby="simulatorTitle">
+      <div class="simulator-header">
+        <div>
+          <h2 id="simulatorTitle">Gain Staging Simulator</h2>
+          <p>先用 Gain / Preamp 把 Input 調到建議範圍，再用 Fader 做輸出音量平衡。</p>
+        </div>
+        <div class="simulator-source" id="simulatorSource">目前聲源：-</div>
+      </div>
+
+      <div class="simulator-grid">
+        <div class="sim-panel sim-panel--gain">
+          <div class="sim-panel-title">
+            <span>Gain / Preamp</span>
+          </div>
+          <button class="gain-knob wing-style-knob" id="gainKnob" type="button" aria-label="調整 Gain" aria-valuemin="0" aria-valuemax="60" aria-valuenow="28">
+            <span class="knob-led-ring" id="knobLedRing" aria-hidden="true"></span>
+            <span class="gain-knob__cap"></span>
+            <span class="gain-knob__mark knob-pointer"></span>
+          </button>
+          <strong class="control-value" id="gainValue">GAIN +28 dB</strong>
+          <p>決定進入系統的原始訊號大小。Gain 太大會先造成輸入失真。</p>
+        </div>
+
+        <div class="sim-panel sim-panel--meter">
+          <div class="sim-panel-title">
+            <span>Input Meter</span>
+            <strong id="inputReadout">RMS -24 dBFS / Peak -9 dBFS</strong>
+          </div>
+          <div class="sim-meter-row">
+            <div class="sim-meter-labels" id="simInputLabels"></div>
+            <div class="sim-meter">
+              <span>RMS</span>
+              <div class="sim-meter-leds" id="inputRmsMeter"></div>
+            </div>
+            <div class="sim-meter">
+              <span>Peak</span>
+              <div class="sim-meter-leds" id="inputPeakMeter"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sim-panel sim-panel--fader">
+          <div class="sim-panel-title">
+            <span>Output Fader</span>
+          </div>
+          <div class="wing-fader" id="wingFader">
+            <div class="fader-scale" aria-hidden="true">
+              <span>+10</span>
+              <span>+5</span>
+              <span class="fader-scale__unity">0</span>
+              <span>-5</span>
+              <span>-10</span>
+              <span>-20</span>
+              <span>-40</span>
+              <span>-∞</span>
+            </div>
+            <div class="fader-track" aria-hidden="true">
+              <span class="fader-line"></span>
+              <span class="fader-unity"></span>
+              <span class="fader-cap" id="faderCap"><span></span></span>
+            </div>
+            <input class="output-fader" id="outputFader" type="range" min="-60" max="10" step="0.5" value="0" aria-label="調整 Output Fader" />
+          </div>
+          <strong class="control-value" id="faderValue">FADER 0.0 dB</strong>
+          <p>Fader 只影響送到輸出或混音中的音量，不會修正 preamp input 過載。</p>
+        </div>
+
+        <div class="sim-panel sim-panel--output">
+          <div class="sim-panel-title">
+            <span>Stereo Output</span>
+            <strong id="outputReadout">L -9 dBFS / R -10 dBFS</strong>
+          </div>
+          <div class="sim-meter-row sim-meter-row--stereo">
+            <div class="sim-meter-labels" id="simOutputLabels"></div>
+            <div class="sim-meter stereo-meter">
+              <span>L</span>
+              <strong class="clip-indicator" id="outputLeftClip">CLIP</strong>
+              <div class="sim-meter-leds" id="outputLeftMeter"></div>
+            </div>
+            <div class="sim-meter stereo-meter">
+              <span>R</span>
+              <strong class="clip-indicator" id="outputRightClip">CLIP</strong>
+              <div class="sim-meter-leds" id="outputRightMeter"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sim-status-grid">
+        <div class="sim-status" id="inputStatusBox">
+          <strong>Input 狀態</strong>
+          <span id="inputStatusMessage">-</span>
+        </div>
+        <div class="sim-status" id="outputStatusBox">
+          <strong>Output 狀態</strong>
+          <span id="outputStatusMessage">-</span>
+        </div>
+      </div>
+
+      <div class="sim-lesson">
+        <span>流程提示</span>
+        <p>Gain / Preamp 控制進入系統的訊號；Fader 控制送出去的音量。先讓 Input Peak 落在目標範圍，再用 Fader 做混音平衡。Input clip 代表前級過載，拉低 Fader 也無法修復失真。</p>
+      </div>
+    </section>
   </main>
 
   <footer>
