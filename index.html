@@ -18,7 +18,11 @@
       <span class="title-zh">互動查詢</span>
     </h1>
     <p>點選樂器或來源，即可查看建議麥克風、RMS 範圍與 Peak 目標。</p>
-    <button class="about-button" id="aboutButton" type="button" aria-haspopup="dialog" aria-controls="aboutModal">使用說明</button>
+    <button class="about-button" id="aboutButton" type="button" aria-haspopup="dialog" aria-controls="aboutModal">
+      <span class="about-button__icon" aria-hidden="true">i</span>
+      使用指南
+    </button>
+    <p class="guide-hint">第一次使用？建議先閱讀「使用指南」，約 1 分鐘即可快速上手。</p>
   </header>
 
   <main>
@@ -210,10 +214,10 @@
   <div class="about-modal" id="aboutModal" role="dialog" aria-modal="true" aria-labelledby="aboutTitle" aria-hidden="true">
     <div class="about-modal__backdrop" data-about-close></div>
     <div class="about-modal__panel" role="document">
-      <button class="about-modal__close" type="button" id="aboutClose" aria-label="關閉使用說明">×</button>
-      <span class="about-modal__eyebrow">使用說明</span>
-      <h2 id="aboutTitle">關於 Gain Staging 互動查詢</h2>
-      <p class="about-modal__intro">快速查詢常見樂器與聲源的 Gain Staging 參考值，並用模擬器理解 Gain、Fader、Input Meter 與 Output Meter 之間的關係。</p>
+      <button class="about-modal__close" type="button" id="aboutClose" aria-label="關閉使用指南">×</button>
+      <span class="about-modal__eyebrow"><span aria-hidden="true">i</span> 使用指南</span>
+      <h2 id="aboutTitle">使用指南</h2>
+      <p class="about-modal__intro">快速了解 Gain Staging、網站功能與 Simulator 操作方式。</p>
       <div class="about-modal__grid">
         <section class="about-section--wide">
           <h3>1. 什麼是 Gain Staging？</h3>
@@ -276,6 +280,11 @@
           <p><strong>Author：</strong>Sylvester</p>
           <p><strong>Repository：</strong><a href="https://github.com/sylvesterexba/gainStaging" target="_blank" rel="noopener noreferrer">https://github.com/sylvesterexba/gainStaging</a></p>
         </section>
+      </div>
+      <div class="about-modal__footer">
+        <p>希望這個工具能幫助你更快建立正確的 Gain Staging 觀念。</p>
+        <p>若有任何建議或發現問題，歡迎至 GitHub 提出 Issue 或提供回饋。</p>
+        <a href="https://github.com/sylvesterexba/gainStaging" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
       </div>
     </div>
   </div>

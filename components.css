@@ -1,6 +1,9 @@
 ﻿/* components.css：集中按鈕、卡片、chip、Modal 與浮動入口等可重複元件。 */
 .about-button {
   margin-top: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   border: 1px solid rgba(56, 189, 248, 0.42);
   border-radius: 999px;
   padding: 10px 18px;
@@ -11,12 +14,29 @@
   box-shadow: inset 0 0 18px rgba(56, 189, 248, 0.08);
   transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
 }
+.about-button__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(125, 211, 252, 0.54);
+  border-radius: 50%;
+  color: #7dd3fc;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1;
+}
 .about-button:hover,
 .about-button:focus-visible {
   transform: translateY(-1px);
   border-color: rgba(125, 211, 252, 0.72);
   background: rgba(14, 165, 233, 0.2);
   outline: none;
+}
+.guide-hint {
+  margin-top: 10px;
+  color: #94a3b8;
+  font-size: 0.92rem;
 }
 .picker-toggle,
 .picker-backdrop {
@@ -356,8 +376,20 @@
   outline: none;
 }
 .about-modal__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   color: #38bdf8;
   font-weight: 900;
+}
+.about-modal__eyebrow span {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid rgba(125, 211, 252, 0.5);
+  border-radius: 50%;
+  font-size: 0.8rem;
 }
 .about-modal h2 {
   margin: 8px 46px 12px 0;
@@ -449,6 +481,18 @@
 .about-version a {
   color: #7dd3fc;
   overflow-wrap: anywhere;
+}
+.about-modal__footer {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(148, 163, 184, 0.16);
+}
+.about-modal__footer p {
+  margin-bottom: 8px;
+}
+.about-modal__footer a {
+  color: #7dd3fc;
+  font-weight: 900;
 }
 body.about-open {
   overflow: hidden;

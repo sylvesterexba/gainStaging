@@ -11,7 +11,7 @@
 - Clip / Clipping 警示項目：模擬削波狀態，電平會衝到 0 dBFS 並亮紅燈，同時顯示降低增益的警告提示。
 - 極簡圖示系統：每個樂器與聲源都有對應圖示，右側詳細面板也會顯示放大的分類圖示。
 - 播放來源支援：包含 3.5mm、Bluetooth、USB Audio、電腦輸出等音訊輸入情境。
-- 使用說明視窗：首頁提供「使用說明」入口，整理 RMS、Peak、Gain / Preamp、Fader 與 Input Clip 的基本概念。
+- 使用指南視窗：首頁提供「使用指南」入口，整理 RMS、Peak、Gain / Preamp、Fader 與 Input Clip 的基本概念。
 - 手機 Drawer：手機版以側邊 Drawer 選擇分類與樂器，點選項目、背景或 Esc 皆可關閉。
 
 ## 第二版功能
