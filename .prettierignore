@@ -1,0 +1,18 @@
+node_modules/
+dist/
+coverage/
+
+# Existing application files keep their current formatting for this workflow-only change.
+base.css
+components.css
+detail.css
+layout.css
+responsive.css
+simulator.css
+index.html
+data.js
+icons.js
+pflMeter.js
+script.js
+simulator.js
+README.md

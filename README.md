@@ -56,3 +56,37 @@
 ## 備註
 
 本工具提供 live sound gain staging 的參考值，實際現場仍需依演出者動態、輸入設備、PA 系統與控台 headroom 調整。
+
+## 開發環境
+
+安裝依賴：
+
+```bash
+npm install
+```
+
+執行 ESLint：
+
+```bash
+npm run lint
+```
+
+自動修正可修復的 ESLint 問題：
+
+```bash
+npm run lint:fix
+```
+
+格式化專案檔案：
+
+```bash
+npm run format
+```
+
+檢查格式：
+
+```bash
+npm run format:check
+```
+
+ESLint 負責檢查 JavaScript 程式品質與常見錯誤，Prettier 負責維持一致的程式格式。GitHub Actions 會在 push 與 pull request 時自動執行 ESLint 與 Prettier 檢查。
