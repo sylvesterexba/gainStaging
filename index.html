@@ -213,27 +213,68 @@
       <button class="about-modal__close" type="button" id="aboutClose" aria-label="關閉使用說明">×</button>
       <span class="about-modal__eyebrow">使用說明</span>
       <h2 id="aboutTitle">關於 Gain Staging 互動查詢</h2>
-      <p>這個工具用來查詢不同樂器 / 聲源的 Gain Staging 參考值，協助現場或錄音前置作業快速抓到合理輸入電平。</p>
+      <p class="about-modal__intro">快速查詢常見樂器與聲源的 Gain Staging 參考值，並用模擬器理解 Gain、Fader、Input Meter 與 Output Meter 之間的關係。</p>
       <div class="about-modal__grid">
-        <section>
-          <h3>核心概念</h3>
+        <section class="about-section--wide">
+          <h3>1. 什麼是 Gain Staging？</h3>
+          <p>Gain Staging（增益級距）是調整音訊系統中各個階段訊號電平的過程。本工具提供常見樂器與聲源的建議參考值，協助建立健康的輸入電平，降低失真風險，並保留足夠 Headroom。</p>
           <ul>
-            <li><strong>RMS</strong> 是平均音量感參考。</li>
-            <li><strong>Peak</strong> 是瞬間最高電平參考。</li>
-            <li><strong>Gain / Preamp</strong> 主要決定輸入電平。</li>
-            <li><strong>Fader</strong> 主要決定送出去的音量。</li>
+            <li>建議 RMS 範圍</li>
+            <li>建議 Peak 範圍</li>
+            <li>建議麥克風類型與推薦型號</li>
+            <li>Headroom 與使用注意事項</li>
           </ul>
+          <p>也可以透過 Gain Staging Simulator，理解 Gain 與 Fader 的不同作用。</p>
         </section>
         <section>
-          <h3>操作流程</h3>
+          <h3>2. 如何使用本工具</h3>
+          <ol class="about-steps">
+            <li><strong>Step 1</strong><span>選擇樂器分類。</span></li>
+            <li><strong>Step 2</strong><span>點選欲查詢的樂器或聲源。</span></li>
+            <li><strong>Step 3</strong><span>查看 RMS、Peak、Headroom、推薦麥克風與注意事項。</span></li>
+            <li><strong>Step 4</strong><span>點擊「前往模擬器」，載入目前樂器設定。</span></li>
+          </ol>
+        </section>
+        <section>
+          <h3>3. Gain Staging Simulator</h3>
+          <dl class="about-definition-list">
+            <dt>Gain / Preamp</dt>
+            <dd>控制訊號進入系統的輸入電平。請先調整 Gain，使 Peak 落在建議範圍內。</dd>
+            <dt>Output Fader</dt>
+            <dd>控制輸出音量。Fader 只會改變輸出大小，不會修復已經發生的 Input Clip。</dd>
+            <dt>Input Meter</dt>
+            <dd>代表 Preamp 後的實際輸入電平，請依照建議 RMS 與 Peak 範圍調整 Gain。</dd>
+            <dt>Output Meter</dt>
+            <dd>代表經過 Fader 後送往主輸出的電平。</dd>
+          </dl>
+        </section>
+        <section>
+          <h3>4. 快速操作</h3>
           <ul>
-            <li>先選樂器或來源。</li>
-            <li>查看建議麥克風、RMS、Peak 與注意事項。</li>
-            <li>可進入模擬器練習 Gain 與 Fader 的差別。</li>
-            <li>桌機 / 手機：Gain Knob 雙擊可回到建議 Gain。</li>
-            <li>桌機 / 手機：Output Fader 雙擊可回到 0 dB。</li>
-            <li>如果 Input Clip，拉低 Fader 不能修復已經發生的失真。</li>
+            <li><strong>Gain Knob</strong>：雙擊可快速回到目前樂器的建議 Gain。</li>
+            <li><strong>Output Fader</strong>：雙擊可快速回到 0 dB。</li>
           </ul>
+        </section>
+        <section class="about-callout about-callout--warning">
+          <h3>5. 常見迷思</h3>
+          <p><strong>錯誤觀念：</strong>Gain 太大，把 Fader 拉低就能修復失真。</p>
+          <p>如果 Input 已經 Clip，失真已經在前級產生。即使降低 Fader，也無法修復已經失真的訊號。</p>
+          <ol class="about-flow">
+            <li>先調整 Gain</li>
+            <li>確認 Input Peak 落在建議範圍</li>
+            <li>再使用 Fader 做輸出音量平衡</li>
+          </ol>
+        </section>
+        <section class="about-callout about-callout--info">
+          <h3>6. 注意事項</h3>
+          <p>本工具提供的是現場音控的建議起點，而非固定標準。實際 Gain 會受到麥克風靈敏度、樂器音量、演奏方式、歌手音量、控台前級設計、PA 系統與演出環境影響。</p>
+          <p>請以耳朵與控台 Meter 為主要依據，本工具提供的是快速建立健康 Gain Structure 的參考值。</p>
+        </section>
+        <section class="about-version about-section--wide">
+          <h3>版本資訊</h3>
+          <p><strong>Version：</strong>v1.0.0</p>
+          <p><strong>Author：</strong>Sylvester</p>
+          <p><strong>Repository：</strong><a href="https://github.com/sylvesterexba/gainStaging" target="_blank" rel="noopener noreferrer">https://github.com/sylvesterexba/gainStaging</a></p>
         </section>
       </div>
     </div>
